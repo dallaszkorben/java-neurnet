@@ -1,8 +1,8 @@
-package layer;
+package hu.akoel.neurnet.layer;
 
 import java.util.ArrayList;
 
-import neuron.INormalNeuron;
+import hu.akoel.neurnet.neuron.INormalNeuron;
 
 public interface IOutputLayer extends ILayer{
 	public void addNeuron(INormalNeuron neuron );	

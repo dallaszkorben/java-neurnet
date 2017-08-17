@@ -1,9 +1,9 @@
-package layer;
+package hu.akoel.neurnet.layer;
 
 import java.util.ArrayList;
 
-import neuron.INeuron;
-import neuron.INormalNeuron;
+import hu.akoel.neurnet.neuron.INeuron;
+import hu.akoel.neurnet.neuron.INormalNeuron;
 
 //TODO mivel az OutputLayer majdnem azonos az InnerLayer-rel ezert nem a Layerbol, hanem egy ujabb Layerbol kellene szarmaztatnom
 public class OutputLayer extends Layer implements IOutputLayer{

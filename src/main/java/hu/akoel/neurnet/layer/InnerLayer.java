@@ -1,10 +1,10 @@
-package layer;
+package hu.akoel.neurnet.layer;
 
 import java.util.Iterator;
 
-import neuron.INeuron;
-import neuron.INormalNeuron;
-import neuron.NeuronValues;
+import hu.akoel.neurnet.neuron.INeuron;
+import hu.akoel.neurnet.neuron.INormalNeuron;
+import hu.akoel.neurnet.neuron.NeuronValues;
 
 public class InnerLayer extends Layer implements IInnerLayer{
 	private ILayer previousLayer;

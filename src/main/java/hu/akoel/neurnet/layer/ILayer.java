@@ -1,8 +1,8 @@
-package layer;
+package hu.akoel.neurnet.layer;
 
 import java.util.Iterator;
 
-import neuron.INeuron;
+import hu.akoel.neurnet.neuron.INeuron;
 
 public interface ILayer {
 	public int getOrder();

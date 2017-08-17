@@ -2,16 +2,16 @@ package hu.akoel.neurnet;
 
 import java.util.ArrayList;
 
-import layer.IInnerLayer;
-import layer.IInputLayer;
-import layer.IOutputLayer;
-import layer.InnerLayer;
-import layer.InputLayer;
-import layer.OutputLayer;
-import neuron.IInputNeuron;
-import neuron.INormalNeuron;
-import neuron.InputNeuron;
-import neuron.NormalNeuron;
+import hu.akoel.neurnet.layer.IInnerLayer;
+import hu.akoel.neurnet.layer.IInputLayer;
+import hu.akoel.neurnet.layer.IOutputLayer;
+import hu.akoel.neurnet.layer.InnerLayer;
+import hu.akoel.neurnet.layer.InputLayer;
+import hu.akoel.neurnet.layer.OutputLayer;
+import hu.akoel.neurnet.neuron.IInputNeuron;
+import hu.akoel.neurnet.neuron.INormalNeuron;
+import hu.akoel.neurnet.neuron.InputNeuron;
+import hu.akoel.neurnet.neuron.NormalNeuron;
 
 public class Test {
 	IInputNeuron inputNeuron1;

@@ -1,4 +1,4 @@
-package neuron;
+package hu.akoel.neurnet.neuron;
 
 public class InputNeuron extends Neuron implements IInputNeuron{
 

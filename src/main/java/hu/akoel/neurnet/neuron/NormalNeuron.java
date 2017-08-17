@@ -1,10 +1,10 @@
-package neuron;
+package hu.akoel.neurnet.neuron;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
 
-import layer.ILayer;
+import hu.akoel.neurnet.layer.ILayer;
 
 
 public class NormalNeuron extends Neuron implements INormalNeuron{	

@@ -1,9 +1,9 @@
-package layer;
+package hu.akoel.neurnet.layer;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import neuron.INeuron;
+import hu.akoel.neurnet.neuron.INeuron;
 
 public abstract class Layer implements ILayer{
 	protected ArrayList<INeuron> neuronList = new ArrayList<INeuron>();

@@ -1,6 +1,6 @@
-package layer;
+package hu.akoel.neurnet.layer;
 
-import neuron.IInputNeuron;
+import hu.akoel.neurnet.neuron.IInputNeuron;
 
 public interface IInputLayer extends ILayer{
 	public void addNeuron(IInputNeuron neuron );
