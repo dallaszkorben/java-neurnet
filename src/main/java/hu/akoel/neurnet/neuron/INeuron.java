@@ -18,6 +18,7 @@ public interface INeuron {
 	public int getOrder();
 	
 	public void calculateWeight( double δ );
+	public void generateRandomWeight();
 	public double getDelta();
 	
 }

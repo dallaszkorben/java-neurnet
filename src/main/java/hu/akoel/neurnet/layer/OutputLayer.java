@@ -1,7 +1,5 @@
 package hu.akoel.neurnet.layer;
 
-import java.util.ArrayList;
-
 import hu.akoel.neurnet.neuron.INeuron;
 import hu.akoel.neurnet.neuron.INormalNeuron;
 
@@ -26,7 +24,7 @@ public class OutputLayer extends Layer implements IOutputLayer{
 	
 	@Override
 	public String toString(){
-		String out = this.getOrder() + ". layer (Output)\n";
+		String out = this.getOrderOfLayer() + ". layer (Output)\n";
 		
 		//Through the Neurons
 		for( INeuron actualNeuron: neuronList){
@@ -40,18 +38,29 @@ public class OutputLayer extends Layer implements IOutputLayer{
 		return previousLayer;
 	}
 
-	public void calculateWeights(ArrayList<Double> expectedOutputs) {		
+	public void calculateWeights(double[] expectedOutputs) {		
 		
 		for( INeuron actualNeuron: neuronList){
 			
 			//Calculate Delta
 			double output = actualNeuron.getSigma();
-			double expectedValue = expectedOutputs.get( this.getNeuronOrder(actualNeuron) );
+			double expectedValue = expectedOutputs[ this.getNeuronOrder(actualNeuron) ];
 			double delta = (expectedValue - output) * output * ( 1 - output );
 			
 			//Calculate Weight
 			actualNeuron.calculateWeight( delta );
 		}		
 		
+	}
+
+	public double getMeanSquareError(double[] expectedOutputs) {
+
+		double squareError = 0;
+		for( INeuron actualNeuron: neuronList){
+			squareError += Math.pow( actualNeuron.getSigma() - expectedOutputs[this.getNeuronOrder(actualNeuron)], 2 );	
+		}
+		squareError /= this.getNumberOfNeurons();
+		
+		return squareError;
 	}
 }

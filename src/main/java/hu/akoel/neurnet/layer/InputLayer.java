@@ -16,7 +16,7 @@ public class InputLayer extends Layer implements IInputLayer {
 	
 	@Override
 	public String toString(){
-		String out = this.getOrder() + ". layer (Input)\n";
+		String out = this.getOrderOfLayer() + ". layer (Input)\n";
 		
 		//Through the Neurons
 		for( INeuron actualNeuron: neuronList){

@@ -24,7 +24,7 @@ public class InnerLayer extends Layer implements IInnerLayer{
 	
 	@Override
 	public String toString(){
-		String out = this.getOrder() + ". layer (Inner)\n";
+		String out = this.getOrderOfLayer() + ". layer (Inner)\n";
 		
 		//Through the Neurons
 		for( INeuron actualNeuron: neuronList){

@@ -12,8 +12,13 @@ public class NormalNeuron extends Neuron implements INormalNeuron{
 	private ArrayList<NeuronValues> valuesList = new ArrayList<NeuronValues>();
 	private ILayer previousLayer;
 
+	//TODO lehet, hogy meg kellene valtoztatni a rendszert
+	//Amikor a neuront hozza adom a layerhez meg semmi nem tortenik
+	//Majd ha osszekotom a ket layert, akkor tortenik meg a neuronok osszefuzese
+	/**
+	 * This method is called when this neuron is added to a layer
+	 */
 	public void initializeNeuron(ILayer actualLayer, ILayer previousLayer) {
-Random rnd = new Random();		
 		
 		initializeNeuron(actualLayer);
 		this.previousLayer = previousLayer;		
@@ -21,7 +26,7 @@ Random rnd = new Random();
 		while( previousNeuronIterator.hasNext() ){	
 //NeuronValues values = new NeuronValues(previousNeuronIterator.next(), defaultWeight );
 						
-			NeuronValues values = new NeuronValues(previousNeuronIterator.next(), rnd.nextDouble() );
+			NeuronValues values = new NeuronValues(previousNeuronIterator.next(), defaultWeight );
 			valuesList.add( values );
 		}
 	}
@@ -63,6 +68,13 @@ Random rnd = new Random();
 
 	public NeuronValues getNeuronValues(int neuronOrder) {
 		return valuesList.get( neuronOrder );
+	}
+
+	//Fills
+	public void generateRandomWeight() {		
+		for( NeuronValues value :valuesList ){
+			value.setW_t( rnd.nextDouble() );
+		}		
 	}
 
 

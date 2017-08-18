@@ -8,7 +8,7 @@ import hu.akoel.neurnet.neuron.INeuron;
 public abstract class Layer implements ILayer{
 	protected ArrayList<INeuron> neuronList = new ArrayList<INeuron>();
 	
-	public int getSize() {
+	public int getNumberOfNeurons() {
 		return neuronList.size();
 	}
 	
@@ -16,7 +16,7 @@ public abstract class Layer implements ILayer{
 		return neuronList.iterator();
 	}
 	
-	public void calculateOutputs() {
+	public void calculateSigmas() {
 		
 		//Go through all neurons
 		for( INeuron actualNeuron: neuronList){
@@ -27,7 +27,7 @@ public abstract class Layer implements ILayer{
 		}		
 	}
 	
-	public int getOrder() {
+	public int getOrderOfLayer() {
 		return getPrevLayer( 0, this );
 	}
 	
@@ -47,6 +47,12 @@ public abstract class Layer implements ILayer{
 	
 	public int getNeuronOrder( INeuron neuron ){
 		return neuronList.indexOf( neuron );
+	}
+	
+	public void generateRandomWeights(){
+		for( INeuron actualNeuron: neuronList){
+			actualNeuron.generateRandomWeight();
+		}
 	}
 	
 }

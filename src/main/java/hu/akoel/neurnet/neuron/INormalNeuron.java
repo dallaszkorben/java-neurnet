@@ -1,7 +1,5 @@
 package hu.akoel.neurnet.neuron;
 
-import java.util.ArrayList;
-
 import hu.akoel.neurnet.layer.ILayer;
 
 public interface INormalNeuron extends INeuron{
