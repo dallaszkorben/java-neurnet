@@ -5,13 +5,13 @@ import java.util.Random;
 import hu.akoel.neurnet.layer.ILayer;
 
 public abstract class Neuron implements INeuron {
-	protected ILayer actualLayer;
+	protected ILayer containerLayer;
 	protected double δ;
 	protected double σ;
 	Random rnd = new Random();
 	
-	public void initializeNeuron(ILayer actualLayer ){
-		this.actualLayer = actualLayer;
+	public void setContainerLayer(ILayer containerLayer ){
+		this.containerLayer = containerLayer;
 	}
 	
 	public double getSigma() {
@@ -23,7 +23,7 @@ public abstract class Neuron implements INeuron {
 	}
 			
 	public int getOrder() {
-		return actualLayer.getNeuronOrder(this);
+		return containerLayer.getNeuronOrder(this);
 	}
 
 	public double getDelta() {

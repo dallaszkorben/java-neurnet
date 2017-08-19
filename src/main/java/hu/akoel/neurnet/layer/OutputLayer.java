@@ -3,35 +3,24 @@ package hu.akoel.neurnet.layer;
 import hu.akoel.neurnet.neuron.INeuron;
 import hu.akoel.neurnet.neuron.INormalNeuron;
 
-//TODO mivel az OutputLayer majdnem azonos az InnerLayer-rel ezert nem a Layerbol, hanem egy ujabb Layerbol kellene szarmaztatnom
 public class OutputLayer extends Layer implements IOutputLayer{
 	private ILayer previousLayer;
-
-	@SuppressWarnings("unused")
-	private OutputLayer(){}
-	
-	//It is mandatory to specify the previous layer
-	public OutputLayer( ILayer previousLayer ){		
-		this.previousLayer = previousLayer;
-	}
 	
 	public void addNeuron(INormalNeuron neuron) {
 		neuronList.add( neuron );
-		
-		//Initialize the Neuron with previous layer
-		neuron.initializeNeuron(this, previousLayer);
+		neuron.setContainerLayer(this);
 	}
-	
-	@Override
-	public String toString(){
-		String out = this.getOrderOfLayer() + ". layer (Output)\n";
+
+	/**
+	 * set the previousLayer and connect every Neurons in the layer
+	 * to the previous layer
+	 */
+	public void setPreviousLayer(ILayer previousLayer) {
+		this.previousLayer = previousLayer;
 		
-		//Through the Neurons
 		for( INeuron actualNeuron: neuronList){
-			out += actualNeuron.toString();
+			((INormalNeuron)actualNeuron).connectToPreviousNeuron(previousLayer);
 		}
-		
-		return out;
 	}
 
 	public ILayer getPreviousLayer() {		
@@ -50,7 +39,6 @@ public class OutputLayer extends Layer implements IOutputLayer{
 			//Calculate Weight
 			actualNeuron.calculateWeight( delta );
 		}		
-		
 	}
 
 	public double getMeanSquareError(double[] expectedOutputs) {
@@ -63,4 +51,17 @@ public class OutputLayer extends Layer implements IOutputLayer{
 		
 		return squareError;
 	}
+	
+	@Override
+	public String toString(){
+		String out = this.getOrderOfLayer() + ". layer (Output)\n";
+		
+		//Through the Neurons
+		for( INeuron actualNeuron: neuronList){
+			out += actualNeuron.toString();
+		}
+		
+		return out;
+	}
+
 }

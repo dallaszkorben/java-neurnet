@@ -8,35 +8,31 @@ import hu.akoel.neurnet.neuron.NeuronValues;
 
 public class InnerLayer extends Layer implements IInnerLayer{
 	private ILayer previousLayer;
-
-	@SuppressWarnings("unused")
-	private InnerLayer(){}
-	
-	//It is mandatory to specify the previous layer
-	public InnerLayer( ILayer previousLayer ){		
-		this.previousLayer = previousLayer;
-	}
+	//private ILayer nextLayer;
 	
 	public void addNeuron(INormalNeuron neuron) {
 		neuronList.add( neuron );
-		neuron.initializeNeuron(this, previousLayer);
+		neuron.setContainerLayer(this);
 	}
 	
-	@Override
-	public String toString(){
-		String out = this.getOrderOfLayer() + ". layer (Inner)\n";
+	/**
+	 * set the previousLayer and connect every Neurons in the layer
+	 * to the previous layer
+	 */
+	public void setPreviousLayer(ILayer previousLayer) {
+		this.previousLayer = previousLayer;
 		
-		//Through the Neurons
 		for( INeuron actualNeuron: neuronList){
-			out += actualNeuron.toString();
+			((INormalNeuron)actualNeuron).connectToPreviousNeuron(previousLayer);
 		}
-		
-		return out;
 	}
 
+	//public void setNextLayer(ILayer nextLayer) {
+	//	this.nextLayer = nextLayer;
+	//}
 
 	public ILayer getPreviousLayer() {		
-		return previousLayer;
+		return previousLayer;		
 	}
 
 	public void calculateWeights(ILayer nextLayer) {
@@ -62,5 +58,17 @@ public class InnerLayer extends Layer implements IInnerLayer{
 			double delta = summaWeightDelta * sigma * ( 1 - sigma );
 			actualNeuron.calculateWeight( delta );
 		}
+	}
+	
+	@Override
+	public String toString(){
+		String out = this.getOrderOfLayer() + ". layer (Inner)\n";
+		
+		//Through the Neurons
+		for( INeuron actualNeuron: neuronList){
+			out += actualNeuron.toString();
+		}
+		
+		return out;
 	}
 }

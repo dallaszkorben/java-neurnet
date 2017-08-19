@@ -4,7 +4,7 @@ import java.util.Iterator;
 
 import hu.akoel.neurnet.neuron.INeuron;
 
-public interface ILayer {
+public interface ILayer {	
 	public int getOrderOfLayer();
 	public int getNumberOfNeurons();
 	public Iterator<INeuron> getIterator();

@@ -37,6 +37,7 @@ public abstract class Layer implements ILayer{
 	 * @param actualLayer
 	 * @return
 	 */
+	//TOD change it if previous layer doesnot exists
 	private int getPrevLayer( int order, ILayer actualLayer ){
 		ILayer previousLayer = actualLayer.getPreviousLayer();
 		if( null != previousLayer ){

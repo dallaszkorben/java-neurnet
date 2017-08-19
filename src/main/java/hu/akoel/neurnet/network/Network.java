@@ -15,18 +15,29 @@ public class Network {
 	IOutputLayer outputLayer;
 	ArrayList<IInnerLayer> innerLayerList = new ArrayList<IInnerLayer>();
 
-	public Network( IInputLayer inputLayer ){
+	public Network( IInputLayer inputLayer, IOutputLayer outputLayer ){
 		this.inputLayer = inputLayer;
-	}
-	
-	public void addInnerLayer( IInnerLayer innerLayer ){
-		this.innerLayerList.add( innerLayer );
-	}
-	
-	public void addOutputLayer( IOutputLayer outputLayer ){
 		this.outputLayer = outputLayer;
 	}
 	
+	//TODO meg kell szuntetni az eddigi kapcsolatokat
+	public void addInnerLayer( IInnerLayer innerLayer ){
+		this.innerLayerList.add( innerLayer );
+	}
+
+	/**
+	 * set the previousLayers for the Layers
+	 */
+	public void makeConnections(){
+		ILayer previousLayer = inputLayer;
+		for( IInnerLayer layer: innerLayerList ){
+			layer.setPreviousLayer(previousLayer);
+			previousLayer = layer;
+		}
+		outputLayer.setPreviousLayer(previousLayer);
+	}
+	
+	//TODO meg kell nezni, hogy a kapcsolat felepult-e (makeConnections())
 	public void training( ArrayList<double[]> trainingInputList, ArrayList<double[]> trainingOutputList, double maxTotalMeanSquareError ){
 		int numberOfTestData = Math.max( trainingInputList.size(), trainingOutputList.size() );
 		
@@ -86,7 +97,6 @@ public class Network {
 				
 				//Error Calculation
 				squareError += outputLayer.getMeanSquareError(trainingOutputArray);
-				
 			}
 			
 			//

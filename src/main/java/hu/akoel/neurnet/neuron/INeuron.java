@@ -8,7 +8,7 @@ public interface INeuron {
 	public static final double α = 0.2; //Tanulasi rata
 	public static final double β = 0.3; //momentum
 
-	public void initializeNeuron(ILayer actualLayer );
+	public void setContainerLayer(ILayer containerLayer );
 	
 	public void calculateOutput();
 	

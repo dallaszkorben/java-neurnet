@@ -10,22 +10,16 @@ import hu.akoel.neurnet.layer.ILayer;
 public class NormalNeuron extends Neuron implements INormalNeuron{	
 
 	private ArrayList<NeuronValues> valuesList = new ArrayList<NeuronValues>();
-	private ILayer previousLayer;
+	//private ILayer previousLayer;
 
-	//TODO lehet, hogy meg kellene valtoztatni a rendszert
-	//Amikor a neuront hozza adom a layerhez meg semmi nem tortenik
-	//Majd ha osszekotom a ket layert, akkor tortenik meg a neuronok osszefuzese
 	/**
-	 * This method is called when this neuron is added to a layer
+	 * This method is called when the Layer added to the Network
 	 */
-	public void initializeNeuron(ILayer actualLayer, ILayer previousLayer) {
+	public void connectToPreviousNeuron(ILayer previousLayer) {
 		
-		initializeNeuron(actualLayer);
-		this.previousLayer = previousLayer;		
+		//this.previousLayer = previousLayer;		
 		Iterator<INeuron> previousNeuronIterator = previousLayer.getIterator();
 		while( previousNeuronIterator.hasNext() ){	
-//NeuronValues values = new NeuronValues(previousNeuronIterator.next(), defaultWeight );
-						
 			NeuronValues values = new NeuronValues(previousNeuronIterator.next(), defaultWeight );
 			valuesList.add( values );
 		}

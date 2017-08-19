@@ -8,23 +8,16 @@ import hu.akoel.neurnet.neuron.INormalNeuron;
 import hu.akoel.neurnet.neuron.NeuronValues;
 
 public class InputLayer extends Layer implements IInputLayer {
-
+	//private ILayer nextLayer;
+	
 	public void addNeuron(IInputNeuron neuron) {
 		neuronList.add(neuron);
-		neuron.initializeNeuron( this );
+		neuron.setContainerLayer( this );
 	}
 	
-	@Override
-	public String toString(){
-		String out = this.getOrderOfLayer() + ". layer (Input)\n";
-		
-		//Through the Neurons
-		for( INeuron actualNeuron: neuronList){
-			out += actualNeuron.toString() + "\n";
-		}
-		
-		return out;
-	}
+	//public void setNextLayer(ILayer nextLayer) {
+	//	this.nextLayer = nextLayer;		
+	//}
 
 	public ILayer getPreviousLayer() {		
 		return null;
@@ -50,7 +43,18 @@ public class InputLayer extends Layer implements IInputLayer {
 			}
 			double delta = summaWeightDelta * sigma * ( 1 - sigma );
 			actualNeuron.calculateWeight( delta );			
+		}		
+	}
+	
+	@Override
+	public String toString(){
+		String out = this.getOrderOfLayer() + ". layer (Input)\n";
+		
+		//Through the Neurons
+		for( INeuron actualNeuron: neuronList){
+			out += actualNeuron.toString() + "\n";
 		}
 		
+		return out;
 	}
 }

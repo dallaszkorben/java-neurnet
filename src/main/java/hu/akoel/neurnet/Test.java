@@ -66,13 +66,13 @@ public class Test {
 		inputLayer.addNeuron(inputNeuron2);
 
 		// Inner Layer 1
-		innerLayer1 = new InnerLayer(inputLayer);
+		innerLayer1 = new InnerLayer();
 		innerLayer1.addNeuron(innerNeuron11);
 		innerLayer1.addNeuron(innerNeuron12);
 		innerLayer1.addNeuron(innerNeuron13);
 
 		// Output Layer
-		outputLayer = new OutputLayer(innerLayer1);
+		outputLayer = new OutputLayer();
 		outputLayer.addNeuron(outputNeuron1);
 
 		inputLayer.generateRandomWeights();
@@ -101,9 +101,9 @@ public class Test {
 		inputList.add( new double[]{0.5,0});
 		outputList.add(new double[]{0.0});
 		
-		Network network = new Network(inputLayer);
+		Network network = new Network(inputLayer, outputLayer);
 		network.addInnerLayer(innerLayer1);
-		network.addOutputLayer(outputLayer);
+		network.makeConnections();
 		network.training(inputList, outputList, 0.0001);
 		
 /*		
