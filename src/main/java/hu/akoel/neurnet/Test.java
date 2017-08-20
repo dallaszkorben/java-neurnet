@@ -75,11 +75,6 @@ public class Test {
 		outputLayer = new OutputLayer();
 		outputLayer.addNeuron(outputNeuron1);
 
-		inputLayer.generateRandomWeights();
-		innerLayer1.generateRandomWeights();
-		outputLayer.generateRandomWeights();		
-
-		
 		ArrayList<double[]> inputList = new ArrayList<double[]>();
 		ArrayList<double[]> outputList = new ArrayList<double[]>();
 		
@@ -103,64 +98,8 @@ public class Test {
 		
 		Network network = new Network(inputLayer, outputLayer);
 		network.addInnerLayer(innerLayer1);
-		network.makeConnections();
 		network.training(inputList, outputList, 0.0001);
 		
-/*		
-		
-		
-		
-		
-		
-		double input1;
-		double input2;
-		double[] expected = new double[1];
-		
-		for( int i = 1; i < 10000000; i++){
-			
-			double sumErr = 0;
-			
-			input1 = 0.1;
-			input2 = 0;		
-			expected[0] =0.4;
-			sumErr += cycle(input1, input2, expected);
-			
-			input1 = 0.1;
-			input2 = 0;
-			expected[0] =0.4;
-			sumErr += cycle(input1, input2, expected);
-			
-			input1 = 0.2;
-			input2 = 0;		
-			expected[0] =0.3;
-			sumErr += cycle(input1, input2, expected);
-
-			input1 = 0.3;
-			input2 = 0;		
-			expected[0] =0.2;
-			sumErr += cycle(input1, input2, expected);
-
-			input1 = 0.4;
-			input2 = 0;		
-			expected[0] =0.1;
-			sumErr += cycle(input1, input2, expected);
-
-			input1 = 0.5;
-			input2 = 0;		
-			expected[0] =0.0;
-			sumErr += cycle(input1, input2, expected);
-			
-			sumErr = sumErr / 6;
-			if( i % 10000 == 0 ){
-				System.err.println( "Total Mean Square Error: " + sumErr);
-			}
-			
-			if( sumErr <= 0.0002){
-				break;
-			}
-
-		}
-*/		
 		
 		double input1 = 0.0;
 		double input2 = 0.0;
@@ -172,39 +111,12 @@ public class Test {
 		innerLayer1.calculateSigmas();
 		outputLayer.calculateSigmas();
 		
-		outputLayer.calculateWeights(expected);
-		
 		System.out.println(inputLayer.toString());
 		System.out.println(innerLayer1.toString());;
 		System.out.println(outputLayer.toString());		
 		
 		
 
-	}
-
-	private double cycle(double input1, double input2, double[] expected) {
-
-		// OUTPUT(t)
-		inputNeuron1.setInput(input1);
-		inputNeuron2.setInput(input2);
-
-		// Sigma calculation by the NEW Input and the OLD Weight
-		inputLayer.calculateSigmas();
-		innerLayer1.calculateSigmas();
-		outputLayer.calculateSigmas();
-
-		// Weight calculation by the new Sigma
-		outputLayer.calculateWeights(expected);
-		innerLayer1.calculateWeights(outputLayer);
-		inputLayer.calculateWeights(innerLayer1);
-
-		// Sigma calculation  by the NEW Input and the NEW Weight
-		inputLayer.calculateSigmas();
-		innerLayer1.calculateSigmas();
-		outputLayer.calculateSigmas();
-		
-			
-		return Math.pow( outputNeuron1.getSigma() - expected[0], 2 );
 	}
 
 	public static void main(String[] args) {

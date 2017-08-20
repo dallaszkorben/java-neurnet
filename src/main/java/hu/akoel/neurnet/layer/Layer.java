@@ -50,10 +50,4 @@ public abstract class Layer implements ILayer{
 		return neuronList.indexOf( neuron );
 	}
 	
-	public void generateRandomWeights(){
-		for( INeuron actualNeuron: neuronList){
-			actualNeuron.generateRandomWeight();
-		}
-	}
-	
 }

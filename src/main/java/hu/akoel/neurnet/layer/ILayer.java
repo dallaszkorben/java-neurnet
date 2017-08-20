@@ -9,7 +9,6 @@ public interface ILayer {
 	public int getNumberOfNeurons();
 	public Iterator<INeuron> getIterator();
 	public void calculateSigmas();
-	public void generateRandomWeights();
 	public ILayer getPreviousLayer();
 	public int getNeuronOrder( INeuron neuron );
 }

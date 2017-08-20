@@ -2,6 +2,7 @@ package hu.akoel.neurnet.layer;
 
 import hu.akoel.neurnet.neuron.INeuron;
 import hu.akoel.neurnet.neuron.INormalNeuron;
+import hu.akoel.neurnet.strategies.DefaultWeightStrategy;
 
 public class OutputLayer extends Layer implements IOutputLayer{
 	private ILayer previousLayer;
@@ -15,11 +16,11 @@ public class OutputLayer extends Layer implements IOutputLayer{
 	 * set the previousLayer and connect every Neurons in the layer
 	 * to the previous layer
 	 */
-	public void setPreviousLayer(ILayer previousLayer) {
+	public void initializeNeurons(ILayer previousLayer, DefaultWeightStrategy defaultWeightStrategy) {
 		this.previousLayer = previousLayer;
 		
 		for( INeuron actualNeuron: neuronList){
-			((INormalNeuron)actualNeuron).connectToPreviousNeuron(previousLayer);
+			((INormalNeuron)actualNeuron).connectToPreviousNeuron(previousLayer, defaultWeightStrategy);
 		}
 	}
 
@@ -27,7 +28,7 @@ public class OutputLayer extends Layer implements IOutputLayer{
 		return previousLayer;
 	}
 
-	public void calculateWeights(double[] expectedOutputs) {		
+	public void calculateWeights(double[] expectedOutputs, double α, double β) {		
 		
 		for( INeuron actualNeuron: neuronList){
 			
@@ -37,7 +38,7 @@ public class OutputLayer extends Layer implements IOutputLayer{
 			double delta = (expectedValue - output) * output * ( 1 - output );
 			
 			//Calculate Weight
-			actualNeuron.calculateWeight( delta );
+			actualNeuron.calculateWeight( delta, α, β );
 		}		
 	}
 

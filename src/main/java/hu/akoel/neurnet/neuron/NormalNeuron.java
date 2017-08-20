@@ -2,40 +2,41 @@ package hu.akoel.neurnet.neuron;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Random;
 
 import hu.akoel.neurnet.layer.ILayer;
-
+import hu.akoel.neurnet.strategies.DefaultWeightStrategy;
 
 public class NormalNeuron extends Neuron implements INormalNeuron{	
 
-	private ArrayList<NeuronValues> valuesList = new ArrayList<NeuronValues>();
+	private ArrayList<NeuronWeights> weightList;
 	//private ILayer previousLayer;
 
 	/**
 	 * This method is called when the Layer added to the Network
 	 */
-	public void connectToPreviousNeuron(ILayer previousLayer) {
+	public void connectToPreviousNeuron( ILayer previousLayer, DefaultWeightStrategy defaultWeightStrategy ) {
+		
+		weightList = new ArrayList<NeuronWeights>();
 		
 		//this.previousLayer = previousLayer;		
 		Iterator<INeuron> previousNeuronIterator = previousLayer.getIterator();
 		while( previousNeuronIterator.hasNext() ){	
-			NeuronValues values = new NeuronValues(previousNeuronIterator.next(), defaultWeight );
-			valuesList.add( values );
+			NeuronWeights values = new NeuronWeights(previousNeuronIterator.next(), defaultWeightStrategy.getValue() );
+			weightList.add( values );
 		}
 	}
 	
 	public void calculateOutput() {
 		double S = 0;
-		for(NeuronValues values:valuesList){
+		for(NeuronWeights values:weightList){
 			S += values.getW_t()* values.getPreviousNeuron().getSigma();
 		}
 		σ = 1 / ( 1 + Math.pow( Math.E, -S ) );
 	}
 
-	public void calculateWeight(double δ) {
+	public void calculateWeight(double δ, double α, double β) {
 		this.δ = δ;
-		for( NeuronValues neuronValues: valuesList ){
+		for( NeuronWeights neuronValues: weightList ){
 			INeuron previousNeuron = neuronValues.getPreviousNeuron();
 			double weight = neuronValues.getW_t();
 			
@@ -45,13 +46,23 @@ public class NormalNeuron extends Neuron implements INormalNeuron{
 		}	
 	}
 	
+	public NeuronWeights getNeuronValues(int neuronOrder) {
+		return weightList.get( neuronOrder );
+	}
+	
+	public void setWeight(DefaultWeightStrategy defaultWeightStrategy) {
+		for( NeuronWeights weightValue: weightList ){
+			weightValue.setW_t( defaultWeightStrategy.getValue() );
+		}
+	}
+	
 	@Override
 	public String toString(){
 		String toIndex = String.valueOf( this.getOrder() );
 		String out = "  " + toIndex + ". Neuron δ=" + δ + "  σ=" + σ + "\n";
 		String fromIndex;		
 				
-		for( NeuronValues neuronValues: valuesList ){
+		for( NeuronWeights neuronValues: weightList ){
 			
 			fromIndex = String.valueOf( neuronValues.getPreviousNeuron().getOrder() );
 			out += "    w" + toIndex + fromIndex + "=" + neuronValues.getW_t() + "\n";
@@ -60,17 +71,6 @@ public class NormalNeuron extends Neuron implements INormalNeuron{
 		return out;
 	}
 
-	public NeuronValues getNeuronValues(int neuronOrder) {
-		return valuesList.get( neuronOrder );
-	}
-
-	//Fills
-	public void generateRandomWeight() {		
-		for( NeuronValues value :valuesList ){
-			value.setW_t( rnd.nextDouble() );
-		}		
-	}
 
 
-	
 }

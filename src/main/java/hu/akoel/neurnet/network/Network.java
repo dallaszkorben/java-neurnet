@@ -9,20 +9,28 @@ import hu.akoel.neurnet.layer.ILayer;
 import hu.akoel.neurnet.layer.IOutputLayer;
 import hu.akoel.neurnet.neuron.IInputNeuron;
 import hu.akoel.neurnet.neuron.INeuron;
+import hu.akoel.neurnet.strategies.DefaultWeightStrategy;
+import hu.akoel.neurnet.strategies.RandomDefaultWeightStrategy;
 
 public class Network {
+	double α = 0.2; //Tanulasi rata
+	double β = 0.3; //momentum
+	
 	IInputLayer inputLayer;
 	IOutputLayer outputLayer;
+	DefaultWeightStrategy defaultWeightStrategy = new RandomDefaultWeightStrategy();
 	ArrayList<IInnerLayer> innerLayerList = new ArrayList<IInnerLayer>();
 
 	public Network( IInputLayer inputLayer, IOutputLayer outputLayer ){
 		this.inputLayer = inputLayer;
-		this.outputLayer = outputLayer;
+		this.outputLayer = outputLayer;	
+		makeConnections();
 	}
 	
 	//TODO meg kell szuntetni az eddigi kapcsolatokat
 	public void addInnerLayer( IInnerLayer innerLayer ){
 		this.innerLayerList.add( innerLayer );
+		makeConnections();
 	}
 
 	/**
@@ -30,27 +38,26 @@ public class Network {
 	 */
 	public void makeConnections(){
 		ILayer previousLayer = inputLayer;
+		
+		inputLayer.initializeNeurons(defaultWeightStrategy);
 		for( IInnerLayer layer: innerLayerList ){
-			layer.setPreviousLayer(previousLayer);
+			layer.initializeNeurons(previousLayer, defaultWeightStrategy);
 			previousLayer = layer;
 		}
-		outputLayer.setPreviousLayer(previousLayer);
+		outputLayer.initializeNeurons(previousLayer, defaultWeightStrategy);
 	}
 	
-	//TODO meg kell nezni, hogy a kapcsolat felepult-e (makeConnections())
+	public void setStartingWeightStrategy( DefaultWeightStrategy startingWeightStrategy ){
+		this.defaultWeightStrategy = startingWeightStrategy;
+		makeConnections();
+	}
+	
 	public void training( ArrayList<double[]> trainingInputList, ArrayList<double[]> trainingOutputList, double maxTotalMeanSquareError ){
 		int numberOfTestData = Math.max( trainingInputList.size(), trainingOutputList.size() );
 		
-		//Initialize WEIGHTs with RANDOM values
-		inputLayer.generateRandomWeights();
-		for( IInnerLayer layer: innerLayerList ){
-			layer.generateRandomWeights();
-		}
-		outputLayer.generateRandomWeights();
-		
 		//Run the training again and again until the error is less then a certain value
 		for( int i = 0; i <= 10000000; i++ ){
-
+			
 			double squareError = 0;
 			
 			//In One period we train the all training data
@@ -68,6 +75,7 @@ public class Network {
 					inputOrder++;
 				}
 				
+				// --- 1. step ---
 				// Sigma calculation by the NEW Input and the OLD Weight
 				inputLayer.calculateSigmas();
 				for( IInnerLayer layer: innerLayerList ){
@@ -75,19 +83,20 @@ public class Network {
 				}
 				outputLayer.calculateSigmas();
 
+				// --- 2. step ---
 				// Weight calculation by the new Sigma
 				// In case of calculation of Weights it is needed: 
 				// -OutputLayer: expected Output
 				// -InputLayer:  previous Layer
-				outputLayer.calculateWeights(trainingOutputArray);
+				outputLayer.calculateWeights(trainingOutputArray, α, β );
 				ILayer nextLayer = outputLayer;				
 				for( IInnerLayer layer: innerLayerList ){
-					layer.calculateWeights(nextLayer);
+					layer.calculateWeights(nextLayer, α, β);
 					nextLayer = layer;
 				}
-				inputLayer.calculateWeights(nextLayer);
+				inputLayer.calculateWeights(nextLayer, α, β);
 				
-
+				// --- 3. step ---
 				// Sigma calculation  by the NEW Input and the NEW Weight
 				inputLayer.calculateSigmas();
 				for( IInnerLayer layer: innerLayerList ){
@@ -103,11 +112,11 @@ public class Network {
 			// Total Mean Square Error Calculation
 			//
 			squareError /= numberOfTestData;
-			if( i % 10000 == 0 ){
+			if( i % 50000 == 0 ){
 				System.err.println( "Total Mean Square Error: " + squareError );
 			}
 			
-			if( squareError <= maxTotalMeanSquareError ){
+			if( squareError <= maxTotalMeanSquareError ){				
 				break;
 			}
 		}
