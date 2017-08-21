@@ -14,7 +14,7 @@ import hu.akoel.neurnet.neuron.INormalNeuron;
 import hu.akoel.neurnet.neuron.InputNeuron;
 import hu.akoel.neurnet.neuron.NormalNeuron;
 
-public class Test {
+public class Example {
 	IInputNeuron inputNeuron1;
 	IInputNeuron inputNeuron2;
 
@@ -38,7 +38,7 @@ public class Test {
 	IInnerLayer innerLayer1;
 	IOutputLayer outputLayer;
 
-	public Test() {
+	public Example() {
 
 
 		inputNeuron1 = new InputNeuron();
@@ -97,6 +97,8 @@ public class Test {
 		outputList.add(new double[]{0.0});
 		
 		Network network = new Network(inputLayer, outputLayer);
+		network.setLearningRate( 0.2 );
+		network.setMomentumCoefficient( 0.5 );
 		network.addInnerLayer(innerLayer1);
 		network.training(inputList, outputList, 0.0001);
 		
@@ -120,7 +122,7 @@ public class Test {
 	}
 
 	public static void main(String[] args) {
-		Test test = new Test();
+		Example test = new Example();
 
 	}
 }

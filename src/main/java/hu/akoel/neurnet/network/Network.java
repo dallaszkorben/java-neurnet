@@ -13,8 +13,11 @@ import hu.akoel.neurnet.strategies.DefaultWeightStrategy;
 import hu.akoel.neurnet.strategies.RandomDefaultWeightStrategy;
 
 public class Network {
-	double α = 0.2; //Tanulasi rata
-	double β = 0.3; //momentum
+	public static final double defaultα = 0.2;
+	public static final double defaultβ = 0.3;
+	
+	double α = defaultα; //Tanulasi rata
+	double β = defaultβ; //momentum
 	
 	IInputLayer inputLayer;
 	IOutputLayer outputLayer;
@@ -33,6 +36,14 @@ public class Network {
 		makeConnections();
 	}
 
+	public void setLearningRate( double α ){
+		this.α = α;
+	}
+	
+	public void setMomentumCoefficient( double β ){
+		this.β = β;
+	}
+	
 	/**
 	 * set the previousLayers for the Layers
 	 */
