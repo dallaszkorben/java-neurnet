@@ -7,6 +7,7 @@ import hu.akoel.neurnet.layer.IInnerLayer;
 import hu.akoel.neurnet.layer.IInputLayer;
 import hu.akoel.neurnet.layer.ILayer;
 import hu.akoel.neurnet.layer.IOutputLayer;
+import hu.akoel.neurnet.listeners.ICycleListener;
 import hu.akoel.neurnet.neuron.IInputNeuron;
 import hu.akoel.neurnet.neuron.INeuron;
 import hu.akoel.neurnet.strategies.DefaultWeightStrategy;
@@ -15,22 +16,24 @@ import hu.akoel.neurnet.strategies.RandomDefaultWeightStrategy;
 public class Network {
 	public static final double defaultα = 0.2;
 	public static final double defaultβ = 0.3;
+	public static final int defaultMaxTrainCycle = 10000000;
 	
-	double α = defaultα; //Tanulasi rata
-	double β = defaultβ; //momentum
+	private double α = defaultα; //Tanulasi rata
+	private double β = defaultβ; //momentum	
+	private int maxTrainCycle = defaultMaxTrainCycle;
 	
-	IInputLayer inputLayer;
-	IOutputLayer outputLayer;
-	DefaultWeightStrategy defaultWeightStrategy = new RandomDefaultWeightStrategy();
-	ArrayList<IInnerLayer> innerLayerList = new ArrayList<IInnerLayer>();
-
+	private IInputLayer inputLayer;
+	private IOutputLayer outputLayer;
+	private DefaultWeightStrategy defaultWeightStrategy = new RandomDefaultWeightStrategy();
+	private ArrayList<IInnerLayer> innerLayerList = new ArrayList<IInnerLayer>();
+	private ICycleListener trainingCycleListener = null;
+	
 	public Network( IInputLayer inputLayer, IOutputLayer outputLayer ){
 		this.inputLayer = inputLayer;
 		this.outputLayer = outputLayer;	
 		makeConnections();
 	}
 	
-	//TODO meg kell szuntetni az eddigi kapcsolatokat
 	public void addInnerLayer( IInnerLayer innerLayer ){
 		this.innerLayerList.add( innerLayer );
 		makeConnections();
@@ -42,6 +45,14 @@ public class Network {
 	
 	public void setMomentumCoefficient( double β ){
 		this.β = β;
+	}
+	
+	public void setMaxTrainCycle( int maxTrainCycle ){
+		this.maxTrainCycle = maxTrainCycle;
+	}
+	
+	public void setTrainingCycleListener( ICycleListener trainingCycleListener ){
+		this.trainingCycleListener = trainingCycleListener;
 	}
 	
 	/**
@@ -67,7 +78,7 @@ public class Network {
 		int numberOfTestData = Math.max( trainingInputList.size(), trainingOutputList.size() );
 		
 		//Run the training again and again until the error is less then a certain value
-		for( int i = 0; i <= 10000000; i++ ){
+		for( int i = 0; i <= maxTrainCycle; i++ ){
 			
 			double squareError = 0;
 			
@@ -118,15 +129,12 @@ public class Network {
 				//Error Calculation
 				squareError += outputLayer.getMeanSquareError(trainingOutputArray);
 			}
-			
-			//
-			// Total Mean Square Error Calculation
-			//
+		
 			squareError /= numberOfTestData;
-			if( i % 50000 == 0 ){
-				System.err.println( "Total Mean Square Error: " + squareError );
-			}
 			
+			if( null != trainingCycleListener )
+				trainingCycleListener.handlerError( i, squareError);
+		
 			if( squareError <= maxTotalMeanSquareError ){				
 				break;
 			}

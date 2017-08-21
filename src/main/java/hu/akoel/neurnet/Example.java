@@ -8,6 +8,7 @@ import hu.akoel.neurnet.layer.IOutputLayer;
 import hu.akoel.neurnet.layer.InnerLayer;
 import hu.akoel.neurnet.layer.InputLayer;
 import hu.akoel.neurnet.layer.OutputLayer;
+import hu.akoel.neurnet.listeners.ICycleListener;
 import hu.akoel.neurnet.network.Network;
 import hu.akoel.neurnet.neuron.IInputNeuron;
 import hu.akoel.neurnet.neuron.INormalNeuron;
@@ -97,7 +98,18 @@ public class Example {
 		outputList.add(new double[]{0.0});
 		
 		Network network = new Network(inputLayer, outputLayer);
-		network.setLearningRate( 0.2 );
+		network.setTrainingCycleListener( new ICycleListener() {
+			
+			public void handlerError(int cycleCounter, double totalMeanSquareError) {
+				if( cycleCounter % 10000 == 0 ){
+					System.err.println( "W:" + innerNeuron13.getNeuronValues(0).getW_t() + "    Err: " + totalMeanSquareError);
+				}
+			}
+		});
+		
+		
+		
+		network.setLearningRate( 0.3 );
 		network.setMomentumCoefficient( 0.5 );
 		network.addInnerLayer(innerLayer1);
 		network.training(inputList, outputList, 0.0001);
@@ -120,6 +132,8 @@ public class Example {
 		
 
 	}
+	
+	
 
 	public static void main(String[] args) {
 		Example test = new Example();

@@ -20,7 +20,11 @@ public class InputNeuron extends Neuron implements IInputNeuron{
 		
 	}
 	
-	public void setInput(double inputValue) {
+	public Double getInput(){
+		return inputValue;
+	}
+	
+	public void setInput(Double inputValue) {
 		this.inputValue = inputValue;		
 	}
 	
@@ -28,6 +32,10 @@ public class InputNeuron extends Neuron implements IInputNeuron{
 		this.w = defaultWeightStrategy.getValue();
 	}
 
+	public double getWeight() {
+		return this.w;
+	}
+	
 	public String toString(){
 		String toIndex = String.valueOf( this.getOrder() );
 		String out = "  " + toIndex + ". Neuron δ=" + δ + "\n";
