@@ -28,7 +28,7 @@ public class InputNeuron extends ANeuron{
 	}
 	
 	public void setWeight(DefaultWeightStrategy defaultWeightStrategy) {
-		this.w = defaultWeightStrategy.getValue();
+		this.w = defaultWeightStrategy.getValue( this );
 	}
 
 	public double getWeight() {

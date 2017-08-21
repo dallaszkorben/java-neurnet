@@ -1,5 +1,7 @@
 package hu.akoel.neurnet.strategies;
 
+import hu.akoel.neurnet.neuron.ANeuron;
+
 public class StaticDefaultWeightStrategy implements DefaultWeightStrategy{
 	private Double value;
 	
@@ -7,8 +9,10 @@ public class StaticDefaultWeightStrategy implements DefaultWeightStrategy{
 		this.value = value;
 	}
 	
-	public Double getValue() {
+	public Double getValue(ANeuron neuron) {
 		return value;		
 	}
+
+	
 	
 }

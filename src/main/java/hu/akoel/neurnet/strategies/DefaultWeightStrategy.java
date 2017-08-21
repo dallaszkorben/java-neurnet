@@ -1,6 +1,8 @@
 package hu.akoel.neurnet.strategies;
 
+import hu.akoel.neurnet.neuron.ANeuron;
+
 public interface DefaultWeightStrategy {
 
-	public Double getValue();
+	public Double getValue( ANeuron neuron );
 }

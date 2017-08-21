@@ -11,14 +11,13 @@ public abstract class ANormalNeuron extends ANeuron{
 
 	/**
 	 * This method is called when the Layer added to the Network
-	 */
-	
+	 */	
 	public void connectToPreviousNeuron( Iterator<ANeuron> previousNeuronIterator, DefaultWeightStrategy defaultWeightStrategy ){
 			
 		weightList = new ArrayList<NeuronWeights>();
 		
 		while( previousNeuronIterator.hasNext() ){	
-			NeuronWeights values = new NeuronWeights(previousNeuronIterator.next(), defaultWeightStrategy.getValue() );
+			NeuronWeights values = new NeuronWeights(previousNeuronIterator.next(), defaultWeightStrategy.getValue( this ) );
 			weightList.add( values );
 		}
 	}
@@ -49,7 +48,7 @@ public abstract class ANormalNeuron extends ANeuron{
 	
 	public void setWeight(DefaultWeightStrategy defaultWeightStrategy) {
 		for( NeuronWeights weightValue: weightList ){
-			weightValue.setW_t( defaultWeightStrategy.getValue() );
+			weightValue.setW_t( defaultWeightStrategy.getValue( this ) );
 		}
 	}
 	
