@@ -2,7 +2,7 @@ package hu.akoel.neurnet.neuron;
 
 import hu.akoel.neurnet.strategies.DefaultWeightStrategy;
 
-public class InputNeuron extends Neuron implements IInputNeuron{
+public class InputNeuron extends ANeuron{
 
 	private Double inputValue;
 	private Double w = null;
@@ -16,8 +16,7 @@ public class InputNeuron extends Neuron implements IInputNeuron{
 		this.δ = δ;
 		
 		//TODO ez kerdes, hogy ertelmes-e
-		w = w + α * δ * inputValue;
-		
+		w = w + α * δ * inputValue;		
 	}
 	
 	public Double getInput(){

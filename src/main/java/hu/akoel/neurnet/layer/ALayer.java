@@ -3,23 +3,25 @@ package hu.akoel.neurnet.layer;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import hu.akoel.neurnet.neuron.INeuron;
+import hu.akoel.neurnet.neuron.ANeuron;
 
-public abstract class Layer implements ILayer{
-	protected ArrayList<INeuron> neuronList = new ArrayList<INeuron>();
+public abstract class ALayer{
+	protected ArrayList<ANeuron> neuronList = new ArrayList<ANeuron>();
+	
+	public abstract ALayer getPreviousLayer();
 	
 	public int getNumberOfNeurons() {
 		return neuronList.size();
 	}
 	
-	public Iterator<INeuron> getIterator(){
+	public Iterator<ANeuron> getNeuronIterator(){
 		return neuronList.iterator();
 	}
 	
 	public void calculateSigmas() {
 		
 		//Go through all neurons
-		for( INeuron actualNeuron: neuronList){
+		for( ANeuron actualNeuron: neuronList){
 
 			//Calculate the weight and the sigma
 			actualNeuron.calculateOutput();			
@@ -38,15 +40,15 @@ public abstract class Layer implements ILayer{
 	 * @return
 	 */
 	//TOD change it if previous layer doesnot exists
-	private int getPrevLayer( int order, ILayer actualLayer ){
-		ILayer previousLayer = actualLayer.getPreviousLayer();
+	private int getPrevLayer( int order, ALayer actualLayer ){
+		ALayer previousLayer = actualLayer.getPreviousLayer();
 		if( null != previousLayer ){
 			order = getPrevLayer( order + 1, previousLayer );
 		}
 		return order;
 	}
 	
-	public int getNeuronOrder( INeuron neuron ){
+	public int getNeuronOrder( ANeuron neuron ){
 		return neuronList.indexOf( neuron );
 	}
 	

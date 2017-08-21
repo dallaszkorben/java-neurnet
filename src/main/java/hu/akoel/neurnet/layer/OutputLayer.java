@@ -1,36 +1,18 @@
 package hu.akoel.neurnet.layer;
 
-import hu.akoel.neurnet.neuron.INeuron;
-import hu.akoel.neurnet.neuron.INormalNeuron;
-import hu.akoel.neurnet.strategies.DefaultWeightStrategy;
+import hu.akoel.neurnet.neuron.ANeuron;
+import hu.akoel.neurnet.neuron.OutputNeuron;
 
-public class OutputLayer extends Layer implements IOutputLayer{
-	private ILayer previousLayer;
+public class OutputLayer extends ANormalLayer{
 	
-	public void addNeuron(INormalNeuron neuron) {
+	public void addNeuron(OutputNeuron neuron) {
 		neuronList.add( neuron );
 		neuron.setContainerLayer(this);
 	}
 
-	/**
-	 * set the previousLayer and connect every Neurons in the layer
-	 * to the previous layer
-	 */
-	public void initializeNeurons(ILayer previousLayer, DefaultWeightStrategy defaultWeightStrategy) {
-		this.previousLayer = previousLayer;
-		
-		for( INeuron actualNeuron: neuronList){
-			((INormalNeuron)actualNeuron).connectToPreviousNeuron(previousLayer, defaultWeightStrategy);
-		}
-	}
-
-	public ILayer getPreviousLayer() {		
-		return previousLayer;
-	}
-
 	public void calculateWeights(double[] expectedOutputs, double α, double β) {		
 		
-		for( INeuron actualNeuron: neuronList){
+		for( ANeuron actualNeuron: neuronList){
 			
 			//Calculate Delta
 			double output = actualNeuron.getSigma();
@@ -45,7 +27,7 @@ public class OutputLayer extends Layer implements IOutputLayer{
 	public double getMeanSquareError(double[] expectedOutputs) {
 
 		double squareError = 0;
-		for( INeuron actualNeuron: neuronList){
+		for( ANeuron actualNeuron: neuronList){
 			squareError += Math.pow( actualNeuron.getSigma() - expectedOutputs[this.getNeuronOrder(actualNeuron)], 2 );	
 		}
 		squareError /= this.getNumberOfNeurons();
@@ -58,7 +40,7 @@ public class OutputLayer extends Layer implements IOutputLayer{
 		String out = this.getOrderOfLayer() + ". layer (Output)\n";
 		
 		//Through the Neurons
-		for( INeuron actualNeuron: neuronList){
+		for( ANeuron actualNeuron: neuronList){
 			out += actualNeuron.toString();
 		}
 		

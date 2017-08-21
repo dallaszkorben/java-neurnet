@@ -2,42 +2,38 @@ package hu.akoel.neurnet;
 
 import java.util.ArrayList;
 
-import hu.akoel.neurnet.layer.IInnerLayer;
-import hu.akoel.neurnet.layer.IInputLayer;
-import hu.akoel.neurnet.layer.IOutputLayer;
 import hu.akoel.neurnet.layer.InnerLayer;
 import hu.akoel.neurnet.layer.InputLayer;
 import hu.akoel.neurnet.layer.OutputLayer;
 import hu.akoel.neurnet.listeners.ICycleListener;
 import hu.akoel.neurnet.network.Network;
-import hu.akoel.neurnet.neuron.IInputNeuron;
-import hu.akoel.neurnet.neuron.INormalNeuron;
+import hu.akoel.neurnet.neuron.InnerNeuron;
 import hu.akoel.neurnet.neuron.InputNeuron;
-import hu.akoel.neurnet.neuron.NormalNeuron;
+import hu.akoel.neurnet.neuron.OutputNeuron;
 
 public class Example {
-	IInputNeuron inputNeuron1;
-	IInputNeuron inputNeuron2;
+	InputNeuron inputNeuron1;
+	InputNeuron inputNeuron2;
 
-	INormalNeuron innerNeuron11;
-	INormalNeuron innerNeuron12;
-	INormalNeuron innerNeuron13;
-	INormalNeuron innerNeuron14;
-	INormalNeuron innerNeuron15;
-	INormalNeuron innerNeuron16;
+	InnerNeuron innerNeuron11;
+	InnerNeuron innerNeuron12;
+	InnerNeuron innerNeuron13;
+	InnerNeuron innerNeuron14;
+	InnerNeuron innerNeuron15;
+	InnerNeuron innerNeuron16;
 	
-	INormalNeuron innerNeuron21;
-	INormalNeuron innerNeuron22;
-	INormalNeuron innerNeuron23;
-	INormalNeuron innerNeuron24;
-	INormalNeuron innerNeuron25;
-	INormalNeuron innerNeuron26;
+	InnerNeuron innerNeuron21;
+	InnerNeuron innerNeuron22;
+	InnerNeuron innerNeuron23;
+	InnerNeuron innerNeuron24;
+	InnerNeuron innerNeuron25;
+	InnerNeuron innerNeuron26;
 	
-	INormalNeuron outputNeuron1;
+	OutputNeuron outputNeuron1;
 	
-	IInputLayer inputLayer;
-	IInnerLayer innerLayer1;
-	IOutputLayer outputLayer;
+	InputLayer inputLayer;
+	InnerLayer innerLayer1;
+	OutputLayer outputLayer;
 
 	public Example() {
 
@@ -45,21 +41,21 @@ public class Example {
 		inputNeuron1 = new InputNeuron();
 		inputNeuron2 = new InputNeuron();
 
-		innerNeuron11 = new NormalNeuron();
-		innerNeuron12 = new NormalNeuron();
-		innerNeuron13 = new NormalNeuron();
-		innerNeuron14 = new NormalNeuron();
-		innerNeuron15 = new NormalNeuron();
-		innerNeuron16 = new NormalNeuron();
+		innerNeuron11 = new InnerNeuron();
+		innerNeuron12 = new InnerNeuron();
+		innerNeuron13 = new InnerNeuron();
+		innerNeuron14 = new InnerNeuron();
+		innerNeuron15 = new InnerNeuron();
+		innerNeuron16 = new InnerNeuron();
 		
-		innerNeuron21 = new NormalNeuron();
-		innerNeuron22 = new NormalNeuron();
-		innerNeuron23 = new NormalNeuron();
-		innerNeuron24 = new NormalNeuron();
-		innerNeuron25 = new NormalNeuron();
-		innerNeuron26 = new NormalNeuron();
+		innerNeuron21 = new InnerNeuron();
+		innerNeuron22 = new InnerNeuron();
+		innerNeuron23 = new InnerNeuron();
+		innerNeuron24 = new InnerNeuron();
+		innerNeuron25 = new InnerNeuron();
+		innerNeuron26 = new InnerNeuron();
 		
-		outputNeuron1 = new NormalNeuron();
+		outputNeuron1 = new OutputNeuron();
 
 		// Input Layer
 		inputLayer = new InputLayer();
@@ -136,7 +132,7 @@ public class Example {
 	
 
 	public static void main(String[] args) {
-		Example test = new Example();
+		new Example();
 
 	}
 }

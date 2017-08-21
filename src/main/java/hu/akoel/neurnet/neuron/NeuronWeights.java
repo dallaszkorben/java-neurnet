@@ -1,20 +1,20 @@
 package hu.akoel.neurnet.neuron;
 
 public class NeuronWeights {
-	private INeuron previousNeuron;
+	private ANeuron previousNeuron;
 	private Double w_t;
 //	private double δ_t;
 //	private double δ_t_1;
 	
 //	public NeuronValues(INeuron previousNeuron, double w_t, double δ_t, double δ_t_1){
-	public NeuronWeights(INeuron previousNeuron, double w_t){		
+	public NeuronWeights(ANeuron previousNeuron, double w_t){		
 		this.previousNeuron = previousNeuron;
 		this.w_t = w_t;
 //		this.δ_t = δ_t;
 //		this.δ_t_1 = δ_t_1;
 	}
 	
-	public INeuron getPreviousNeuron() {
+	public ANeuron getPreviousNeuron() {
 		return previousNeuron;
 	}
 

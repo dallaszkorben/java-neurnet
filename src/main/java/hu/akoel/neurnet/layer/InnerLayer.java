@@ -2,43 +2,22 @@ package hu.akoel.neurnet.layer;
 
 import java.util.Iterator;
 
-import hu.akoel.neurnet.neuron.INeuron;
-import hu.akoel.neurnet.neuron.INormalNeuron;
+import hu.akoel.neurnet.neuron.ANeuron;
+import hu.akoel.neurnet.neuron.ANormalNeuron;
+import hu.akoel.neurnet.neuron.InnerNeuron;
 import hu.akoel.neurnet.neuron.NeuronWeights;
 import hu.akoel.neurnet.strategies.DefaultWeightStrategy;
 
-public class InnerLayer extends Layer implements IInnerLayer{
-	private ILayer previousLayer;
-	//private ILayer nextLayer;
+public class InnerLayer extends ANormalLayer{
 	
-	public void addNeuron(INormalNeuron neuron) {
+	public void addNeuron(InnerNeuron neuron) {
 		neuronList.add( neuron );
 		neuron.setContainerLayer(this);
 	}
-	
-	/**
-	 * set the previousLayer and connect every Neurons in the layer
-	 * to the previous layer
-	 */
-	public void initializeNeurons(ILayer previousLayer, DefaultWeightStrategy defaultWeightStrategy) {
-		this.previousLayer = previousLayer;
 		
-		for( INeuron actualNeuron: neuronList){
-			((INormalNeuron)actualNeuron).connectToPreviousNeuron(previousLayer, defaultWeightStrategy);
-		}
-	}
+	public void calculateWeights(ALayer nextLayer, double α, double β) {
 
-	//public void setNextLayer(ILayer nextLayer) {
-	//	this.nextLayer = nextLayer;
-	//}
-
-	public ILayer getPreviousLayer() {		
-		return previousLayer;		
-	}
-
-	public void calculateWeights(ILayer nextLayer, double α, double β) {
-
-		for( INeuron actualNeuron: neuronList){
+		for( ANeuron actualNeuron: neuronList){
 			
 			//Calculate Delta
 			
@@ -46,10 +25,10 @@ public class InnerLayer extends Layer implements IInnerLayer{
 			int actualNeuronOrder = this.getNeuronOrder(actualNeuron);			
 			double summaWeightDelta = 0;
 			
-			Iterator<INeuron> nextNeuronIterator = nextLayer.getIterator();
+			Iterator<ANeuron> nextNeuronIterator = nextLayer.getNeuronIterator();
 			while( nextNeuronIterator.hasNext()){
 				
-				INormalNeuron nextNeuron = (INormalNeuron)nextNeuronIterator.next();
+				ANormalNeuron nextNeuron = (ANormalNeuron)nextNeuronIterator.next();
 				
 				double nextDelta = nextNeuron.getDelta();
 				NeuronWeights nextNeuronValues = nextNeuron.getNeuronValues( actualNeuronOrder );
@@ -67,7 +46,7 @@ public class InnerLayer extends Layer implements IInnerLayer{
 		String out = this.getOrderOfLayer() + ". layer (Inner)\n";
 		
 		//Through the Neurons
-		for( INeuron actualNeuron: neuronList){
+		for( ANeuron actualNeuron: neuronList){
 			out += actualNeuron.toString();
 		}
 		

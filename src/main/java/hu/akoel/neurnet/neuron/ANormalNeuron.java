@@ -3,23 +3,20 @@ package hu.akoel.neurnet.neuron;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import hu.akoel.neurnet.layer.ILayer;
 import hu.akoel.neurnet.strategies.DefaultWeightStrategy;
 
-public class NormalNeuron extends Neuron implements INormalNeuron{	
+public abstract class ANormalNeuron extends ANeuron{	
 
-	private ArrayList<NeuronWeights> weightList;
-	//private ILayer previousLayer;
+	protected ArrayList<NeuronWeights> weightList;
 
 	/**
 	 * This method is called when the Layer added to the Network
 	 */
-	public void connectToPreviousNeuron( ILayer previousLayer, DefaultWeightStrategy defaultWeightStrategy ) {
-		
+	
+	public void connectToPreviousNeuron( Iterator<ANeuron> previousNeuronIterator, DefaultWeightStrategy defaultWeightStrategy ){
+			
 		weightList = new ArrayList<NeuronWeights>();
 		
-		//this.previousLayer = previousLayer;		
-		Iterator<INeuron> previousNeuronIterator = previousLayer.getIterator();
 		while( previousNeuronIterator.hasNext() ){	
 			NeuronWeights values = new NeuronWeights(previousNeuronIterator.next(), defaultWeightStrategy.getValue() );
 			weightList.add( values );
@@ -36,13 +33,13 @@ public class NormalNeuron extends Neuron implements INormalNeuron{
 
 	public void calculateWeight(double δ, double α, double β) {
 		this.δ = δ;
-		for( NeuronWeights neuronValues: weightList ){
-			INeuron previousNeuron = neuronValues.getPreviousNeuron();
-			double weight = neuronValues.getW_t();
+		for( NeuronWeights neuronWeights: weightList ){
+			ANeuron previousNeuron = neuronWeights.getPreviousNeuron();
+			double weight = neuronWeights.getW_t();
 			
 			weight = weight + α * δ * previousNeuron.getSigma();
 			
-			neuronValues.setW_t( weight );
+			neuronWeights.setW_t( weight );
 		}	
 	}
 	
@@ -70,7 +67,4 @@ public class NormalNeuron extends Neuron implements INormalNeuron{
 		
 		return out;
 	}
-
-
-
 }

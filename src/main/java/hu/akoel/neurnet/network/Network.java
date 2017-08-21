@@ -3,13 +3,13 @@ package hu.akoel.neurnet.network;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import hu.akoel.neurnet.layer.IInnerLayer;
-import hu.akoel.neurnet.layer.IInputLayer;
-import hu.akoel.neurnet.layer.ILayer;
-import hu.akoel.neurnet.layer.IOutputLayer;
+import hu.akoel.neurnet.layer.ALayer;
+import hu.akoel.neurnet.layer.InnerLayer;
+import hu.akoel.neurnet.layer.InputLayer;
+import hu.akoel.neurnet.layer.OutputLayer;
 import hu.akoel.neurnet.listeners.ICycleListener;
-import hu.akoel.neurnet.neuron.IInputNeuron;
-import hu.akoel.neurnet.neuron.INeuron;
+import hu.akoel.neurnet.neuron.ANeuron;
+import hu.akoel.neurnet.neuron.InputNeuron;
 import hu.akoel.neurnet.strategies.DefaultWeightStrategy;
 import hu.akoel.neurnet.strategies.RandomDefaultWeightStrategy;
 
@@ -22,19 +22,19 @@ public class Network {
 	private double β = defaultβ; //momentum	
 	private int maxTrainCycle = defaultMaxTrainCycle;
 	
-	private IInputLayer inputLayer;
-	private IOutputLayer outputLayer;
+	private InputLayer inputLayer;
+	private OutputLayer outputLayer;
 	private DefaultWeightStrategy defaultWeightStrategy = new RandomDefaultWeightStrategy();
-	private ArrayList<IInnerLayer> innerLayerList = new ArrayList<IInnerLayer>();
+	private ArrayList<InnerLayer> innerLayerList = new ArrayList<InnerLayer>();
 	private ICycleListener trainingCycleListener = null;
 	
-	public Network( IInputLayer inputLayer, IOutputLayer outputLayer ){
+	public Network( InputLayer inputLayer, OutputLayer outputLayer ){
 		this.inputLayer = inputLayer;
 		this.outputLayer = outputLayer;	
 		makeConnections();
 	}
 	
-	public void addInnerLayer( IInnerLayer innerLayer ){
+	public void addInnerLayer( InnerLayer innerLayer ){
 		this.innerLayerList.add( innerLayer );
 		makeConnections();
 	}
@@ -59,10 +59,10 @@ public class Network {
 	 * set the previousLayers for the Layers
 	 */
 	public void makeConnections(){
-		ILayer previousLayer = inputLayer;
+		ALayer previousLayer = inputLayer;
 		
 		inputLayer.initializeNeurons(defaultWeightStrategy);
-		for( IInnerLayer layer: innerLayerList ){
+		for( InnerLayer layer: innerLayerList ){
 			layer.initializeNeurons(previousLayer, defaultWeightStrategy);
 			previousLayer = layer;
 		}
@@ -89,10 +89,10 @@ public class Network {
 				double[] trainingOutputArray = trainingOutputList.get(j);
 				
 				//Load Inputs for Sigma calculation
-				Iterator<INeuron> iterator = inputLayer.getIterator();
+				Iterator<ANeuron> iterator = inputLayer.getNeuronIterator();
 				int inputOrder = 0;
 				while( iterator.hasNext() ){
-					IInputNeuron neuron = (IInputNeuron)iterator.next();
+					InputNeuron neuron = (InputNeuron)iterator.next();
 					neuron.setInput( trainingInputArray[inputOrder]);					
 					inputOrder++;
 				}
@@ -100,7 +100,7 @@ public class Network {
 				// --- 1. step ---
 				// Sigma calculation by the NEW Input and the OLD Weight
 				inputLayer.calculateSigmas();
-				for( IInnerLayer layer: innerLayerList ){
+				for( InnerLayer layer: innerLayerList ){
 					layer.calculateSigmas();
 				}
 				outputLayer.calculateSigmas();
@@ -111,8 +111,8 @@ public class Network {
 				// -OutputLayer: expected Output
 				// -InputLayer:  previous Layer
 				outputLayer.calculateWeights(trainingOutputArray, α, β );
-				ILayer nextLayer = outputLayer;				
-				for( IInnerLayer layer: innerLayerList ){
+				ALayer nextLayer = outputLayer;				
+				for( InnerLayer layer: innerLayerList ){
 					layer.calculateWeights(nextLayer, α, β);
 					nextLayer = layer;
 				}
@@ -121,7 +121,7 @@ public class Network {
 				// --- 3. step ---
 				// Sigma calculation  by the NEW Input and the NEW Weight
 				inputLayer.calculateSigmas();
-				for( IInnerLayer layer: innerLayerList ){
+				for( InnerLayer layer: innerLayerList ){
 					layer.calculateSigmas();
 				}
 				outputLayer.calculateSigmas();

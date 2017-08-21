@@ -1,13 +1,19 @@
 package hu.akoel.neurnet.neuron;
 
-import hu.akoel.neurnet.layer.ILayer;
+import hu.akoel.neurnet.layer.ALayer;
 
-public abstract class Neuron implements INeuron {
-	protected ILayer containerLayer;
+public abstract class ANeuron{
+	public static final double defaultDelta = 0.0;
+	
+	protected ALayer containerLayer;
 	protected double δ;
 	protected double σ;
 	
-	public void setContainerLayer(ILayer containerLayer ){
+	public abstract void calculateOutput();
+	
+	public abstract void calculateWeight(double δ, double α, double β);
+	
+	public void setContainerLayer(ALayer containerLayer ){
 		this.containerLayer = containerLayer;
 	}
 	

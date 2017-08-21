@@ -1,6 +1,5 @@
 package hu.akoel.neurnet;
 
-import hu.akoel.neurnet.neuron.IInputNeuron;
 import hu.akoel.neurnet.neuron.InputNeuron;
 import hu.akoel.neurnet.strategies.StaticDefaultWeightStrategy;
 import junit.framework.Test;
@@ -17,7 +16,7 @@ public class NeuronTest extends TestCase{
         return new TestSuite( NeuronTest.class );
     }
 
-    public void testSetterGetterPairs(){
+    public void testInputNeuronSetterGetterPairs(){
     	Double[][] dataPairs = {
     			//{input, w, δ}
     			{0.0, 0.5, 0.0},
@@ -26,7 +25,7 @@ public class NeuronTest extends TestCase{
     	};
 
     	for (int i = 0; i < dataPairs.length; i++ ){
-    		IInputNeuron inputNeuron = new InputNeuron();
+    		InputNeuron inputNeuron = new InputNeuron();
 
     		// --- w ---
     		inputNeuron.setWeight( new StaticDefaultWeightStrategy( dataPairs[i][1] ) );
@@ -54,15 +53,13 @@ public class NeuronTest extends TestCase{
     	
     	};
     	for (int i = 0; i < dataPairs.length; i++ ){
-    		IInputNeuron inputNeuron = new InputNeuron();
+    		InputNeuron inputNeuron = new InputNeuron();
     		inputNeuron.setWeight( new StaticDefaultWeightStrategy( dataPairs[i][0] ) );
     		inputNeuron.setInput( dataPairs[i][1] );
     		inputNeuron.calculateOutput();
     		    		
-    		assertEquals( dataPairs[i][2], inputNeuron.getSigma() );
-   		
-    	}
-    	
+    		assertEquals( dataPairs[i][2], inputNeuron.getSigma() );   		
+    	}    	
     }
     
     public void testInputNeuronCalculateWeightMethod(){
@@ -78,7 +75,7 @@ public class NeuronTest extends TestCase{
     	
     	};
     	for (int i = 0; i < dataPairs.length; i++ ){
-    		IInputNeuron inputNeuron = new InputNeuron();
+    		InputNeuron inputNeuron = new InputNeuron();
     		inputNeuron.setWeight( new StaticDefaultWeightStrategy( dataPairs[i][1] ) );
     		inputNeuron.setInput( dataPairs[i][0] );
     		inputNeuron.calculateWeight(dataPairs[i][2], dataPairs[i][3], dataPairs[i][4]);
