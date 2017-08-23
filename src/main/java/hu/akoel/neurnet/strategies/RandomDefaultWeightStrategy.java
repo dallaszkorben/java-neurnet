@@ -6,8 +6,8 @@ import hu.akoel.neurnet.neuron.ANeuron;
 
 public class RandomDefaultWeightStrategy implements DefaultWeightStrategy{
 	Random rnd = new Random();
-	
-	public Double getValue(ANeuron neuron) {
+
+	public Double getValue(ANeuron previousNeuron, ANeuron actualNeuron) {
 		return rnd.nextDouble();
 	}
 }

@@ -6,6 +6,7 @@ import hu.akoel.neurnet.neuron.ANeuron;
 import hu.akoel.neurnet.neuron.InnerNeuron;
 import hu.akoel.neurnet.neuron.InputNeuron;
 import hu.akoel.neurnet.neuron.OutputNeuron;
+import hu.akoel.neurnet.strategies.SigmoidActivationFunction;
 import hu.akoel.neurnet.strategies.StaticDefaultWeightStrategy;
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -24,7 +25,7 @@ public class NeuronTest extends TestCase{
     // -------------
     // --- Input ---
     // -------------
-    public void testInputNeuronSetterGetterPairs(){
+    public void testInputNeuron_Check_SetterGetterPairs(){
     	Double[][] dataPairs = {
     			//{input, w, σ, δ}
     			{0.0, 0.5, 0.0, 2.3},
@@ -45,17 +46,27 @@ public class NeuronTest extends TestCase{
 
     		// --- σ ---
     		inputNeuron.setSigma( dataPairs[i][2] );
-    		assertEquals( dataPairs[i][2], inputNeuron.getSigma() );
+    		assertEquals( dataPairs[i][2], inputNeuron.getStoredSigma() );
 
+       		// --- order ---
+    		inputNeuron.setOrder( i );
+    		assertEquals( i, inputNeuron.getOrder() );
+    		
     		// --- δ ---
-    		inputNeuron.calculateWeight(dataPairs[i][3], 0.5, 0.7 );
+    		//inputNeuron.calculateWeight(dataPairs[i][3], 0.5, 0.7 );
+    		inputNeuron.setDelta( dataPairs[i][3] );
     		assertEquals( dataPairs[i][3], inputNeuron.getDelta() );
-    		
-    		
-    	}    	
+    	}
+    	
+    	// --- ActivationFunctionStrategey ---
+    	SigmoidActivationFunction safs = new SigmoidActivationFunction();
+    	InputNeuron inputNeuron = new InputNeuron();
+    	inputNeuron.setActivationFunctionStrategy( safs );
+    	assertEquals( safs, inputNeuron.getActivationFunctionStrategy() );    	
+    	
     }
     
-    public void testInputNeuronCalculateOutputMethod(){
+    public void testInputNeuron_CalculateOutput_Method(){
     	Double[][] dataPairs = {
     			//{Input, w, expectedValue}
     			{0.0, 10.0, 0.5},
@@ -71,11 +82,11 @@ public class NeuronTest extends TestCase{
     		inputNeuron.setInput( dataPairs[i][0] );
     		inputNeuron.calculateOutput();
     		    		
-    		assertEquals( dataPairs[i][2], inputNeuron.getSigma() );   		
+    		assertEquals( dataPairs[i][2], inputNeuron.getStoredSigma() );   		
     	}    	
     }
     
-    public void testInputNeuronCalculateWeightMethod(){
+    public void testInputNeuron_CalculateWeight_Method(){
     	Double[][] dataPairs = {
     			//{input, w, δ, α, β, expectedValue}
     												//β=0.0
@@ -102,7 +113,7 @@ public class NeuronTest extends TestCase{
     // --------------
     // --- Inner ---
     // --------------
-    public void testInnerNeuronSetterGetterPairs(){
+    public void testInnerNeuron_Check_SetterGetterPairs(){
     	Double[][] dataPairs = {
     			//{w, σ, δ}
     			{0.5, 0.0, 0.3},
@@ -110,8 +121,8 @@ public class NeuronTest extends TestCase{
     			{0.0, 0.0, 0.7},
     			{0.3, 0.5, 1.1},
     	};
-    	double α = 0.5;
-    	double β = 0.7;    	
+    	//double α = 0.5;
+    	//double β = 0.7;    	
     	double input = 2.3;
     	double w = -7.5;
     	InputNeuron inputNeuron = new InputNeuron();    	
@@ -129,16 +140,26 @@ public class NeuronTest extends TestCase{
     		
        		// --- σ ---
     		innerNeuron.setSigma( dataPairs[i][1] );
-    		assertEquals( dataPairs[i][1], innerNeuron.getSigma() );
+    		assertEquals( dataPairs[i][1], innerNeuron.getStoredSigma() );
+    		
+       		// --- order ---
+    		innerNeuron.setOrder( i );
+    		assertEquals( i, innerNeuron.getOrder() );
     		
     		// --- δ ---
-    		innerNeuron.calculateWeight(dataPairs[i][2], α, β );
+    		innerNeuron.setDelta( dataPairs[i][2] );
     		assertEquals( dataPairs[i][2], innerNeuron.getDelta() );
     		
-    	}    	
+    	}
+    	
+       	// --- ActivationFunctionStrategey ---
+    	SigmoidActivationFunction safs = new SigmoidActivationFunction();
+    	inputNeuron = new InputNeuron();
+    	inputNeuron.setActivationFunctionStrategy( safs );
+    	assertEquals( safs, inputNeuron.getActivationFunctionStrategy() );    	
     }
     
-    public void testInnerNeuronCalculateOutputMethod(){
+    public void testInnerNeuron_CalculateOutput_Method(){
     	Double[][] dataPairs = {
     			//{input (σ), w, expected}
     			{0.0, 10.0, 0.5},
@@ -160,11 +181,11 @@ public class NeuronTest extends TestCase{
     		innerNeuron.connectToPreviousNeuron(inputNeuronList.iterator(), new StaticDefaultWeightStrategy( dataPairs[i][1] ) );
     		innerNeuron.calculateOutput();
     		    		
-    		assertEquals( dataPairs[i][2], innerNeuron.getSigma() );    		
+    		assertEquals( dataPairs[i][2], innerNeuron.getStoredSigma() );    		
     	}    	
     }
     
-    public void testInnerNeuronCalculateWeightMethod(){
+    public void testInnerNeuron_CalculateWeight_Method(){
     	Double[][] dataPairs = {
     			//{input, w, δ, α, β, expectedValue}
     												//β=0.0
@@ -195,7 +216,7 @@ public class NeuronTest extends TestCase{
     // --------------
     // --- Output ---
     // --------------
-    public void testOutputNeuronSetterGetterPairs(){
+    public void testOutputNeuron_Check_SetterGetterPairs(){
     	Double[][] dataPairs = {
     			//{w, σ, δ}
     			{0.5, 0.0, 0.3},
@@ -203,8 +224,8 @@ public class NeuronTest extends TestCase{
     			{0.0, 0.0, 0.7},
     			{0.3, 0.5, 1.1},
     	};
-    	double α = 0.5;
-    	double β = 0.7;    	
+    	//double α = 0.5;
+    	//double β = 0.7;    	
     	double input = 2.3;
     	double w = -7.5;
     	InputNeuron inputNeuron = new InputNeuron();    	
@@ -222,16 +243,25 @@ public class NeuronTest extends TestCase{
     		
        		// --- σ ---
     		outputNeuron.setSigma( dataPairs[i][1] );
-    		assertEquals( dataPairs[i][1], outputNeuron.getSigma() );
+    		assertEquals( dataPairs[i][1], outputNeuron.getStoredSigma() );
+    		
+       		// --- order ---
+    		outputNeuron.setOrder( i );
+    		assertEquals( i, outputNeuron.getOrder() );
     		
     		// --- δ ---
-    		outputNeuron.calculateWeight(dataPairs[i][2], α, β );
-    		assertEquals( dataPairs[i][2], outputNeuron.getDelta() );
-    		
+    		outputNeuron.setDelta( dataPairs[i][2] );
+    		assertEquals( dataPairs[i][2], outputNeuron.getDelta() );    		
     	}    	
+    	
+       	// --- ActivationFunctionStrategey ---
+    	SigmoidActivationFunction safs = new SigmoidActivationFunction();
+    	inputNeuron = new InputNeuron();
+    	inputNeuron.setActivationFunctionStrategy( safs );
+    	assertEquals( safs, inputNeuron.getActivationFunctionStrategy() );    	
     }
     
-    public void testOutputNeuronCalculateOutputMethod(){
+    public void testOutputNeuron_CalculateOutput_Method(){
     	Double[][] dataPairs = {
     			//{input (σ), w, expected}
     			{0.0, 10.0, 0.5},
@@ -253,11 +283,11 @@ public class NeuronTest extends TestCase{
     		outputNeuron.connectToPreviousNeuron(inputNeuronList.iterator(), new StaticDefaultWeightStrategy( dataPairs[i][1] ) );
     		outputNeuron.calculateOutput();
     		    		
-    		assertEquals( dataPairs[i][2], outputNeuron.getSigma() );    		
+    		assertEquals( dataPairs[i][2], outputNeuron.getStoredSigma() );    		
     	}    	
     }
     
-    public void testOutputNeuronCalculateWeightMethod(){
+    public void testOutputNeuron_CalculateWeight_Method(){
     	Double[][] dataPairs = {
     			//{input, w, δ, α, β, expectedValue}
     												//β=0.0
@@ -283,8 +313,6 @@ public class NeuronTest extends TestCase{
     		
     		assertEquals( dataPairs[i][5], outputNeuron.getNeuronValues(0).getW_t() );   		
     	}   
-    }
-    
-    
+    }   
 
 }

@@ -12,12 +12,13 @@ public abstract class ANormalNeuron extends ANeuron{
 	/**
 	 * This method is called when the Layer added to the Network
 	 */	
-	public void connectToPreviousNeuron( Iterator<ANeuron> previousNeuronIterator, DefaultWeightStrategy defaultWeightStrategy ){
+	public void connectToPreviousNeuron( Iterator<? extends ANeuron> previousNeuronIterator, DefaultWeightStrategy defaultWeightStrategy ){
 			
 		weightList = new ArrayList<NeuronWeights>();
 		
 		while( previousNeuronIterator.hasNext() ){	
-			NeuronWeights values = new NeuronWeights(previousNeuronIterator.next(), defaultWeightStrategy.getValue( this ) );
+			ANeuron previousNeuron = previousNeuronIterator.next();
+			NeuronWeights values = new NeuronWeights(previousNeuron, defaultWeightStrategy.getValue( previousNeuron, this ) );
 			weightList.add( values );
 		}
 	}
@@ -25,18 +26,19 @@ public abstract class ANormalNeuron extends ANeuron{
 	public void calculateOutput() {
 		double S = 0;
 		for(NeuronWeights values:weightList){
-			S += values.getW_t()* values.getPreviousNeuron().getSigma();
+			S += values.getW_t()* values.getPreviousNeuron().getStoredSigma();
 		}
-		σ = 1 / ( 1 + Math.pow( Math.E, -S ) );
+		σ = getActivationFunctionStrategy().getSigma(S);	//1 / ( 1 + Math.pow( Math.E, -S ) );
 	}
 
+	@Override
 	public void calculateWeight(double δ, double α, double β) {
 		this.δ = δ;
 		for( NeuronWeights neuronWeights: weightList ){
 			ANeuron previousNeuron = neuronWeights.getPreviousNeuron();
 			double weight = neuronWeights.getW_t();
 			
-			weight = weight + α * δ * previousNeuron.getSigma();
+			weight = weight + α * δ * previousNeuron.getStoredSigma();
 			
 			neuronWeights.setW_t( weight );
 		}	
@@ -48,7 +50,7 @@ public abstract class ANormalNeuron extends ANeuron{
 	
 	public void setWeight(DefaultWeightStrategy defaultWeightStrategy) {
 		for( NeuronWeights weightValue: weightList ){
-			weightValue.setW_t( defaultWeightStrategy.getValue( this ) );
+			weightValue.setW_t( defaultWeightStrategy.getValue( weightValue.getPreviousNeuron(), this ) );
 		}
 	}
 	

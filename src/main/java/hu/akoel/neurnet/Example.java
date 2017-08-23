@@ -101,19 +101,16 @@ public class Example {
 					System.err.println( "W:" + innerNeuron13.getNeuronValues(0).getW_t() + "    Err: " + totalMeanSquareError);
 				}
 			}
-		});
-		
-		
+		});	
 		
 		network.setLearningRate( 0.3 );
 		network.setMomentumCoefficient( 0.5 );
 		network.addInnerLayer(innerLayer1);
-		network.training(inputList, outputList, 0.0001);
-		
+		network.training(inputList, outputList, 0.0008);
 		
 		double input1 = 0.0;
 		double input2 = 0.0;
-		double[] expected = new double[]{0.5};
+		//double[] expected = new double[]{0.5};
 		inputNeuron1.setInput(input1);
 		inputNeuron2.setInput(input2);
 		

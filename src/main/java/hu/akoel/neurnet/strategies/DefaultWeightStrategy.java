@@ -4,5 +4,5 @@ import hu.akoel.neurnet.neuron.ANeuron;
 
 public interface DefaultWeightStrategy {
 
-	public Double getValue( ANeuron neuron );
+	public Double getValue( ANeuron previousNeuron, ANeuron actualNeuron );
 }

@@ -9,8 +9,8 @@ public class StaticDefaultWeightStrategy implements DefaultWeightStrategy{
 		this.value = value;
 	}
 	
-	public Double getValue(ANeuron neuron) {
-		return value;		
+	public Double getValue(ANeuron previousNeuron, ANeuron actualNeuron) {
+		return value;
 	}
 
 	

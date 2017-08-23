@@ -8,7 +8,6 @@ import hu.akoel.neurnet.layer.InnerLayer;
 import hu.akoel.neurnet.layer.InputLayer;
 import hu.akoel.neurnet.layer.OutputLayer;
 import hu.akoel.neurnet.listeners.ICycleListener;
-import hu.akoel.neurnet.neuron.ANeuron;
 import hu.akoel.neurnet.neuron.InputNeuron;
 import hu.akoel.neurnet.strategies.DefaultWeightStrategy;
 import hu.akoel.neurnet.strategies.RandomDefaultWeightStrategy;
@@ -30,12 +29,16 @@ public class Network {
 	
 	public Network( InputLayer inputLayer, OutputLayer outputLayer ){
 		this.inputLayer = inputLayer;
-		this.outputLayer = outputLayer;	
+		inputLayer.setOrderOfLayer( 0 );
+		this.outputLayer = outputLayer;
+		outputLayer.setOrderOfLayer( 1 );
 		makeConnections();
 	}
 	
 	public void addInnerLayer( InnerLayer innerLayer ){
 		this.innerLayerList.add( innerLayer );
+		innerLayer.setOrderOfLayer( this.innerLayerList.size() );
+		this.outputLayer.setOrderOfLayer( this.outputLayer.getOrderOfLayer() + 1 );
 		makeConnections();
 	}
 
@@ -56,10 +59,10 @@ public class Network {
 	}
 	
 	/**
-	 * set the previousLayers for the Layers
+	 * set the weight for the Layers
 	 */
 	public void makeConnections(){
-		ALayer previousLayer = inputLayer;
+		ALayer<?,?> previousLayer = inputLayer;
 		
 		inputLayer.initializeNeurons(defaultWeightStrategy);
 		for( InnerLayer layer: innerLayerList ){
@@ -89,7 +92,7 @@ public class Network {
 				double[] trainingOutputArray = trainingOutputList.get(j);
 				
 				//Load Inputs for Sigma calculation
-				Iterator<ANeuron> iterator = inputLayer.getNeuronIterator();
+				Iterator<InputNeuron> iterator = inputLayer.getNeuronIterator();
 				int inputOrder = 0;
 				while( iterator.hasNext() ){
 					InputNeuron neuron = (InputNeuron)iterator.next();
@@ -111,7 +114,7 @@ public class Network {
 				// -OutputLayer: expected Output
 				// -InputLayer:  previous Layer
 				outputLayer.calculateWeights(trainingOutputArray, α, β );
-				ALayer nextLayer = outputLayer;				
+				ALayer<?,?> nextLayer = outputLayer;				
 				for( InnerLayer layer: innerLayerList ){
 					layer.calculateWeights(nextLayer, α, β);
 					nextLayer = layer;

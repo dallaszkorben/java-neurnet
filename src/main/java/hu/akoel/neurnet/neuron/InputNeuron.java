@@ -7,11 +7,13 @@ public class InputNeuron extends ANeuron{
 	private Double inputValue;
 	private Double w = null;
 	
+	@Override
 	public void calculateOutput() {
 		double S = w * inputValue;
-		σ = 1 / ( 1 + Math.pow( Math.E, -S ) );		
+		σ = getActivationFunctionStrategy().getSigma(S);	//1 / ( 1 + Math.pow( Math.E, -S ) );		
 	}
 
+	@Override
 	public void calculateWeight(double δ, double α, double β) {
 		this.δ = δ;
 		
@@ -28,13 +30,14 @@ public class InputNeuron extends ANeuron{
 	}
 	
 	public void setWeight(DefaultWeightStrategy defaultWeightStrategy) {
-		this.w = defaultWeightStrategy.getValue( this );
+		this.w = defaultWeightStrategy.getValue( null, this );
 	}
 
 	public double getWeight() {
 		return this.w;
 	}
 	
+	@Override
 	public String toString(){
 		String toIndex = String.valueOf( this.getOrder() );
 		String out = "  " + toIndex + ". Neuron δ=" + δ + "\n";

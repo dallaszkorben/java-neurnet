@@ -1,5 +1,6 @@
 package hu.akoel.neurnet.layer;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import hu.akoel.neurnet.neuron.ANeuron;
@@ -8,32 +9,41 @@ import hu.akoel.neurnet.neuron.InputNeuron;
 import hu.akoel.neurnet.neuron.NeuronWeights;
 import hu.akoel.neurnet.strategies.DefaultWeightStrategy;
 
-public class InputLayer extends ALayer{
+public class InputLayer extends ALayer<InputLayer, InputNeuron>{
+	private ArrayList<InputNeuron> neuronList = new ArrayList<InputNeuron>();	
 	
-	public void addNeuron(InputNeuron neuron) {
-		neuronList.add(neuron);
-		neuron.setContainerLayer( this );
+	@Override
+	public ArrayList<InputNeuron> getNeuronList() {
+		return neuronList;
 	}
+	
+//	public void addNeuron(InputNeuron neuron) {
+//		neuronList.add(neuron);
+//		neuron.setOrder( neuronList.size() - 1 );
+//		//neuron.setContainerLayer( this );
+//	}
 
 	public void initializeNeurons(DefaultWeightStrategy defaultWeightStrategy) {
-		for( ANeuron actualNeuron: neuronList){
-			((InputNeuron)actualNeuron).setWeight(defaultWeightStrategy);
+		for( InputNeuron actualNeuron: neuronList){
+			actualNeuron.setWeight(defaultWeightStrategy);
 		}		
 	}
 	
-	public ALayer getPreviousLayer() {		
-		return null;
-	}
+//	@Override
+//	public ALayer<?, ?> getPreviousLayer(){
+//		return null;
+//	}
 
-	public void calculateWeights(ALayer nextLayer, double α, double β) {
+	public void calculateWeights(ALayer<?, ?> nextLayer, double α, double β) {
 		
 		//Through the Neurons
-		for( ANeuron actualNeuron: neuronList){
-			double sigma = actualNeuron.getSigma();
+		for( InputNeuron actualNeuron: neuronList){
+
+			double sigma = actualNeuron.getStoredSigma();
 			int actualNeuronOrder = this.getNeuronOrder(actualNeuron);			
 			double summaWeightDelta = 0;
 			
-			Iterator<ANeuron> nextNeuronIterator = nextLayer.getNeuronIterator();
+			Iterator<? extends ANeuron> nextNeuronIterator = nextLayer.getNeuronIterator();
 			while( nextNeuronIterator.hasNext()){
 				
 				ANormalNeuron nextNeuron = (ANormalNeuron)nextNeuronIterator.next();
@@ -45,7 +55,7 @@ public class InputLayer extends ALayer{
 			}
 			
 			//TODO move it to Neuron
-			double delta = summaWeightDelta * sigma * ( 1 - sigma );
+			double delta = summaWeightDelta * actualNeuron.getActivationFunctionStrategy().getDerivatedSigmaByStoredSigma(sigma); //sigma * ( 1 - sigma );
 			actualNeuron.calculateWeight( delta, α, β );
 			//actualNeuron.calculateWeight( summaWeightDelta, α, β );
 		}		
@@ -62,4 +72,6 @@ public class InputLayer extends ALayer{
 		
 		return out;
 	}
+
+
 }
