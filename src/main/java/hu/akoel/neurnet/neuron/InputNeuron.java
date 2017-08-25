@@ -40,7 +40,7 @@ public class InputNeuron extends ANeuron{
 	@Override
 	public String toString(){
 		String toIndex = String.valueOf( this.getOrder() );
-		String out = "  " + toIndex + ". Neuron δ=" + δ + "\n";
+		String out = "  " + toIndex + ". Neuron (Input) δ=" + δ + "\n";
 		out += "    w=" + w;
 		return out;
 	}
