@@ -7,119 +7,299 @@ import hu.akoel.neurnet.layer.InputLayer;
 import hu.akoel.neurnet.layer.OutputLayer;
 import hu.akoel.neurnet.listeners.ICycleListener;
 import hu.akoel.neurnet.network.Network;
+import hu.akoel.neurnet.neuron.ANeuron;
 import hu.akoel.neurnet.neuron.InnerNeuron;
 import hu.akoel.neurnet.neuron.InputNeuron;
 import hu.akoel.neurnet.neuron.OutputNeuron;
+import hu.akoel.neurnet.strategies.DefaultWeightStrategy;
 
 public class Example {
-	InputNeuron inputNeuron1;
-	InputNeuron inputNeuron2;
+/*   	double[][] trainingData = {
 
-	InnerNeuron innerNeuron11;
-	InnerNeuron innerNeuron12;
-	InnerNeuron innerNeuron13;
-	InnerNeuron innerNeuron14;
-	InnerNeuron innerNeuron15;
-	InnerNeuron innerNeuron16;
-	
-	InnerNeuron innerNeuron21;
-	InnerNeuron innerNeuron22;
-	InnerNeuron innerNeuron23;
-	InnerNeuron innerNeuron24;
-	InnerNeuron innerNeuron25;
-	InnerNeuron innerNeuron26;
-	
-	OutputNeuron outputNeuron1;
-	
-	InputLayer inputLayer;
-	InnerLayer innerLayer1;
-	OutputLayer outputLayer;
+			//--- 1 ---
+			{0.0, 0.0, 1.0},
+			{0.0, 0.25, 1.0},
+			{0.0, 0.5, 1.0},    			
+			{0.0, 0.75, 1.0},
+			{0.0, 1.0, 1.0},    			
+			
+			{0.25, 0.0, 1.0},
+			{0.25, 0.25, 1.0},
+			{0.25, 0.5, 1.0},    			
+			{0.25, 0.75, 1.0},
+			{0.25, 1.0, 1.0},
 
+			{0.5, 0.0, 1.0},
+			{0.5, 0.25, 1.0},
+			{0.5, 0.5, 1.0},   			
+			{0.5, 0.75, 1.0},
+			{0.5, 1.0, 1.0},
+
+			{0.75, 0.0, 1.0},
+			{0.75, 0.25, 1.0},
+			{0.75, 0.5, 1.0},    			
+			{0.75, 0.75, 1.0},
+			{0.75, 1.0, 1.0},
+
+			{1.0, 0.0, 1.0},
+			{1.0, 0.25, 1.0},
+			{1.0, 0.5, 1.0},
+			{1.0, 0.75, 1.0},
+			{1.0, 1.0, 1.0},
+
+			
+			//--- 1 ---
+			{1.25, 1.25, 2.0},
+			{1.25, 1.5, 2.0},
+			{1.25, 1.75, 2.0},
+			{1.25, 2.0, 2.0},
+			{1.25, 2.25, 2.0},
+			{1.25, 2.5, 2.0},
+			{1.25, 2.75, 2.0},
+			{1.25, 3.0, 2.0},
+			
+			{1.5, 1.25, 2.0},
+			{1.5, 1.5, 2.0},
+			{1.5, 1.75, 2.0},
+			{1.5, 2.0, 2.0},
+			{1.5, 2.25, 2.0},
+			{1.5, 2.5, 2.0},
+			{1.5, 2.75, 2.0},
+			{1.5, 3.0, 2.0},
+			
+			{1.75, 1.25, 2.0},
+			{1.75, 1.5, 2.0},
+			{1.75, 1.75, 2.0},
+			{1.75, 2.0, 2.0},
+			{1.75, 2.25, 2.0},
+			{1.75, 2.5, 2.0},
+			{1.75, 2.75, 2.0},
+			{1.75, 3.0, 2.0},    			
+			
+			{2.0, 1.25, 2.0},
+			{2.0, 1.5, 2.0},
+			{2.0, 2.0, 2.0},
+			{2.0, 2.25, 2.0},
+			{2.0, 2.5, 2.0},
+			{2.0, 2.75, 2.0},
+			{2.0, 3.0, 2.0},
+			
+			{2.25, 1.25, 2.0},
+			{2.25, 1.5, 2.0},
+			{2.25, 1.75, 2.0},
+			{2.25, 2.0, 2.0},
+			{2.25, 2.25, 2.0},
+			{2.25, 2.5, 2.0},
+			{2.25, 2.75, 2.0},
+			{2.25, 3.0, 2.0},
+			
+			{2.5, 1.25, 2.0},
+			{2.5, 1.5, 2.0},
+			{2.5, 1.75, 2.0},
+			{2.5, 2.0, 2.0},
+			{2.5, 2.25, 2.0},
+			{2.5, 2.5, 2.0},
+			{2.5, 2.75, 2.0},
+			{2.5, 3.0, 2.0},
+			
+			{2.75, 1.25, 2.0},
+			{2.75, 1.5, 2.0},
+			{2.75, 1.75, 2.0},
+			{2.75, 2.0, 2.0},
+			{2.75, 2.25, 2.0},
+			{2.75, 2.5, 2.0},
+			{2.75, 2.75, 2.0},
+			{2.75, 3.0, 2.0},
+			
+			{3.0, 3.0, 2.0},
+			{3.0, 1.25, 2.0},
+			{3.0, 1.5, 2.0},
+			{3.0, 1.75, 2.0},
+			{3.0, 2.0, 2.0},
+			{3.0, 2.25, 2.0},
+			{3.0, 1.5, 2.0},
+			{3.0, 2.75, 2.0},
+			{3.0, 1.25, 2.0},
+			
+			//--- 2 ---
+			{3.25, 3.25, 1.0},
+			{3.25, 3.5, 1.0},
+			{3.25, 3.75, 1.0},
+			{3.25, 4.0, 1.0},
+			{3.25, 4.25, 1.0},
+			{3.25, 4.75, 1.0},
+			{3.25, 5.0, 1.0},
+			
+			{3.5, 3.25, 1.0},
+			{3.5, 3.5, 1.0},
+			{3.5, 3.75, 1.0},
+			{3.5, 4.0, 1.0},
+			{3.5, 4.25, 1.0},
+			{3.5, 4.5, 1.0},
+			{3.5, 4.75, 1.0},
+			{3.5, 5.0, 1.0},
+			
+			{3.75, 3.25, 1.0},
+			{3.75, 3.5, 1.0},
+			{3.75, 3.75, 1.0},
+			{3.75, 4.0, 1.0},
+			{3.75, 4.25, 1.0},
+			{3.75, 4.5, 1.0},
+			{3.75, 4.75, 1.0},
+			{3.75, 5.0, 1.0},
+			
+			{4.0, 3.25, 1.0},
+			{4.0, 3.5, 1.0},
+			{4.0, 3.75, 1.0},
+			{4.0, 4.0, 1.0},
+			{4.0, 4.25, 1.0},
+			{4.0, 4.5, 1.0},
+			{4.0, 4.75, 1.0},
+			{4.0, 5.0, 1.0},
+			
+			{4.25, 3.25, 1.0},
+			{4.25, 3.5, 1.0},
+			{4.25, 3.75, 1.0},
+			{4.25, 4.0, 1.0},
+			{4.25, 4.25, 1.0},
+			{4.25, 4.5, 1.0},
+			{4.25, 4.75, 1.0},
+			{4.25, 5.0, 1.0},
+
+			{4.5, 3.25, 1.0},
+			{4.5, 3.5, 1.0},
+			{4.5, 3.75, 1.0},
+			{4.5, 4.0, 1.0},
+			{4.5, 4.25, 1.0},
+			{4.5, 4.5, 1.0},
+			{4.5, 4.75, 1.0},
+			{4.5, 5.0, 1.0},
+
+			{4.75, 3.25, 1.0},
+			{4.75, 3.5, 1.0},
+			{4.75, 3.75, 1.0},
+			{4.75, 4.0, 1.0},
+			{4.75, 4.25, 1.0},
+			{4.75, 4.5, 1.0},
+			{4.75, 4.75, 1.0},
+			{4.75, 5.0, 1.0},
+			
+			{5.0, 3.25, 1.0},
+			{5.0, 3.5, 1.0},
+			{5.0, 3.75, 1.0},
+			{5.0, 4.0, 1.0},
+			{5.0, 4.25, 1.0},
+			{5.0, 4.5, 1.0},
+			{5.0, 4.75, 1.0},
+			{5.0, 5.0, 1.0},
+			
+	};
+*/
+/*	double[][] trainingData = {
+			{0.1, 0.4},
+			{0.1, 0.4},
+			{0.2, 0.3},    			
+			{0.3, 0.2},
+			{0.4, 0.1},
+			{0.5, 0.0},    			 			
+	};
+*/
+	double[][] trainingData = {
+			{0.1, 0.1},
+			{0.2, 0.1},    			
+			{0.3, 0.1},
+			{0.4, 0.1},
+			{0.5, 0.1},    			 			
+			{0.6, 0.2},
+			{0.7, 0.2},
+			{0.8, 0.2},
+			{0.9, 0.2},
+			{1.0, 0.2},
+	};
+	
 	public Example() {
+	
+		int numberOfNeuronsInput = 2;
+    	int numberOfNeuronsInner1 = 4;
+    	int numberOfNeuronsInner2 = 4;
+    	int numberOfNeuronsOutput = 1;
 
-
-		inputNeuron1 = new InputNeuron();
-		inputNeuron2 = new InputNeuron();
-
-		innerNeuron11 = new InnerNeuron();
-		innerNeuron12 = new InnerNeuron();
-		innerNeuron13 = new InnerNeuron();
-		innerNeuron14 = new InnerNeuron();
-		innerNeuron15 = new InnerNeuron();
-		innerNeuron16 = new InnerNeuron();
+		//
+    	//Input Layer
+    	InputLayer inputLayer = new InputLayer();    			
+    	for( int i = 0; i < numberOfNeuronsInput; i++ ){
+    		InputNeuron inputNeuron = new InputNeuron();
+    		inputLayer.addNeuron(inputNeuron);
+    	}
 		
-		innerNeuron21 = new InnerNeuron();
-		innerNeuron22 = new InnerNeuron();
-		innerNeuron23 = new InnerNeuron();
-		innerNeuron24 = new InnerNeuron();
-		innerNeuron25 = new InnerNeuron();
-		innerNeuron26 = new InnerNeuron();
+    	//
+    	//Inner Layer
+    	InnerLayer innerLayer1 = new InnerLayer();    			
+    	for( int i = 0; i < numberOfNeuronsInner1; i++ ){
+    		InnerNeuron innerNeuron = new InnerNeuron();
+    		innerLayer1.addNeuron(innerNeuron);
+    	}    	
+
+    	InnerLayer innerLayer2 = new InnerLayer();    			
+    	for( int i = 0; i < numberOfNeuronsInner2; i++ ){
+    		InnerNeuron innerNeuron = new InnerNeuron();
+    		innerLayer2.addNeuron(innerNeuron);
+    	}    	
+
+    	//
+    	//Output Layer
+    	OutputLayer outputLayer = new OutputLayer();
+    	for( int i = 0; i < numberOfNeuronsOutput; i++ ){
+    		OutputNeuron outputNeuron = new OutputNeuron();
+    		outputLayer.addNeuron(outputNeuron);
+    	}		
 		
-		outputNeuron1 = new OutputNeuron();
-
-		// Input Layer
-		inputLayer = new InputLayer();
-		inputLayer.addNeuron(inputNeuron1);
-		inputLayer.addNeuron(inputNeuron2);
-
-		// Inner Layer 1
-		innerLayer1 = new InnerLayer();
-		innerLayer1.addNeuron(innerNeuron11);
-		innerLayer1.addNeuron(innerNeuron12);
-		innerLayer1.addNeuron(innerNeuron13);
-
-		// Output Layer
-		outputLayer = new OutputLayer();
-		outputLayer.addNeuron(outputNeuron1);
-
-		ArrayList<double[]> inputList = new ArrayList<double[]>();
-		ArrayList<double[]> outputList = new ArrayList<double[]>();
-		
-		inputList.add( new double[]{0.1,0});
-		outputList.add(new double[]{0.4});
-		
-		inputList.add( new double[]{0.1,0});
-		outputList.add(new double[]{0.4});
-		
-		inputList.add( new double[]{0.2,0});
-		outputList.add(new double[]{0.3});
-
-		inputList.add( new double[]{0.3,0});
-		outputList.add(new double[]{0.2});
-
-		inputList.add( new double[]{0.4,0});
-		outputList.add(new double[]{0.1});
-
-		inputList.add( new double[]{0.5,0});
-		outputList.add(new double[]{0.0});
+    	double[] trainingInput = new double[3];
+    	double[] trainingOutput = new double[1];
+    	ArrayList<double[]> trainingInputList = new ArrayList<double[]>();
+    	ArrayList<double[]> trainingOutputList = new ArrayList<double[]>();
+    	for( int i = 0; i < trainingData.length; i++ ){
+    		trainingInput = new double[]{ trainingData[i][0], 1.0 };
+    		trainingOutput = new double[]{ trainingData[i][1] };
+        	trainingInputList.add(trainingInput);
+        	trainingOutputList.add(trainingOutput);
+    	}
 		
 		Network network = new Network(inputLayer, outputLayer);
-		network.setTrainingCycleListener( new ICycleListener() {
-			
+		network.addInnerLayer(innerLayer1);
+		//network.addInnerLayer(innerLayer2);
+		network.setLearningRate( 0.7 );
+		network.setMomentum( 0.5 );
+		network.setMaxTrainCycle( 1000000000 );
+		
+		//network.setStartingWeightStrategy( new DefaultWeightStrategy() {
+		//	public Double getValue(ANeuron previousNeuron, ANeuron actualNeuron) {
+		//		return ( actualNeuron.getOrder() + 0.0 );
+		//	}
+		//} );
+		network.setTrainingCycleListener( new ICycleListener() {			
 			public void handlerError(int cycleCounter, double totalMeanSquareError) {
 				if( cycleCounter % 10000 == 0 ){
-					System.err.println( "W:" + innerNeuron13.getNeuronValues(0).getW_t() + "    Err: " + totalMeanSquareError);
+					System.err.println( "i: " + cycleCounter + "    Err: " + totalMeanSquareError);
 				}
 			}
-		});	
+		});
 		
-		network.setLearningRate( 0.3 );
-		network.setMomentumCoefficient( 0.5 );
-		network.addInnerLayer(innerLayer1);
-		network.training(inputList, outputList, 0.0008);
+		network.training(trainingInputList, trainingOutputList, 0.00026);
 		
-		double input1 = 0.0;
-		double input2 = 0.0;
-		//double[] expected = new double[]{0.5};
-		inputNeuron1.setInput(input1);
-		inputNeuron2.setInput(input2);
+		double[] testInput = new double[]{0,1, 3.1};
+		
+		inputLayer.getNeuronList().get(0).setInput(testInput[0] );
+		inputLayer.getNeuronList().get(1).setInput( 1.0 );
+		//inputLayer.getNeuronList().get(1).setInput(testInput[1] / 10);
+		//inputLayer.getNeuronList().get(1).setInput( 1.0 );
 		
 		inputLayer.calculateSigmas();
 		innerLayer1.calculateSigmas();
 		outputLayer.calculateSigmas();
 		
-		System.out.println(inputLayer.toString());
-		System.out.println(innerLayer1.toString());;
+		//System.out.println(inputLayer.toString());
+		//System.out.println(innerLayer1.toString());;
 		System.out.println(outputLayer.toString());		
 		
 		

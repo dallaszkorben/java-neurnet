@@ -16,23 +16,12 @@ public class InputLayer extends ALayer<InputLayer, InputNeuron>{
 	public ArrayList<InputNeuron> getNeuronList() {
 		return neuronList;
 	}
-	
-//	public void addNeuron(InputNeuron neuron) {
-//		neuronList.add(neuron);
-//		neuron.setOrder( neuronList.size() - 1 );
-//		//neuron.setContainerLayer( this );
-//	}
 
 	public void initializeNeurons(DefaultWeightStrategy defaultWeightStrategy) {
 		for( InputNeuron actualNeuron: neuronList){
 			actualNeuron.setWeight(defaultWeightStrategy);
 		}		
 	}
-	
-//	@Override
-//	public ALayer<?, ?> getPreviousLayer(){
-//		return null;
-//	}
 
 	public void calculateWeights(ALayer<?, ?> nextLayer, double α, double β) {
 		

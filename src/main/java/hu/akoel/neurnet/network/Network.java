@@ -1,7 +1,10 @@
 package hu.akoel.neurnet.network;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 import hu.akoel.neurnet.layer.ALayer;
 import hu.akoel.neurnet.layer.InnerLayer;
@@ -46,12 +49,24 @@ public class Network {
 		this.α = α;
 	}
 	
-	public void setMomentumCoefficient( double β ){
+	public double getLearningRate(){
+		return this.α;
+	}
+	
+	public void setMomentum( double β ){
 		this.β = β;
+	}
+	
+	public double getMomentum(){
+		return this.β;
 	}
 	
 	public void setMaxTrainCycle( int maxTrainCycle ){
 		this.maxTrainCycle = maxTrainCycle;
+	}
+	
+	public int getMaxTrainCycle(){
+		return this.maxTrainCycle;
 	}
 	
 	public void setTrainingCycleListener( ICycleListener trainingCycleListener ){
@@ -61,7 +76,7 @@ public class Network {
 	/**
 	 * set the weight for the Layers
 	 */
-	public void makeConnections(){
+	private void makeConnections(){
 		ALayer<?,?> previousLayer = inputLayer;
 		
 		inputLayer.initializeNeurons(defaultWeightStrategy);
@@ -115,10 +130,19 @@ public class Network {
 				// -InputLayer:  previous Layer
 				outputLayer.calculateWeights(trainingOutputArray, α, β );
 				ALayer<?,?> nextLayer = outputLayer;				
-				for( InnerLayer layer: innerLayerList ){
+
+				ListIterator<InnerLayer> innerLayerBackIterator = innerLayerList.listIterator(innerLayerList.size()); 
+				while( innerLayerBackIterator.hasPrevious() ){
+					InnerLayer layer = innerLayerBackIterator.previous();
 					layer.calculateWeights(nextLayer, α, β);
 					nextLayer = layer;
 				}
+				//List<InnerLayer> shallowCopy = innerLayerList.subList(0, innerLayerList.size());
+				//Collections.reverse(shallowCopy);
+				//for( InnerLayer layer: shallowCopy ){
+				//	layer.calculateWeights(nextLayer, α, β);
+				//	nextLayer = layer;
+				//}
 				inputLayer.calculateWeights(nextLayer, α, β);
 				
 				// --- 3. step ---
