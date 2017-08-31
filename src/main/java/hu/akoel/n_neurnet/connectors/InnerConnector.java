@@ -6,8 +6,6 @@ import hu.akoel.n_neurnet.layer.Layer;
 import hu.akoel.n_neurnet.neuron.Neuron;
 import hu.akoel.n_neurnet.strategies.IResetWeightStrategy;
 import hu.akoel.n_neurnet.strategies.RandomResetWeightStrategy;
-import hu.akoel.neurnet.layer.InputLayer;
-import hu.akoel.neurnet.neuron.InputNeuron;
 
 public class InnerConnector implements IInputConnector, IOutputConnector{
 	private IResetWeightStrategy resetWeightStrategy = new RandomResetWeightStrategy();
@@ -59,7 +57,7 @@ public class InnerConnector implements IInputConnector, IOutputConnector{
 		Iterator<Neuron> neuronIterator = outputLayer.getNeuronIterator();
 		while( neuronIterator.hasNext() ){
 			Neuron outputNeuron = neuronIterator.next();
-			summa += outputNeuron.getSigma() * getInputWeight(outputNeuron.getOrder(), inputNeuronOrder);
+			summa += outputNeuron.getSigma() * getInputWeight(outputNeuron.getIndex(), inputNeuronOrder);
 		}		
 		return summa;	
 	}
@@ -73,7 +71,7 @@ public class InnerConnector implements IInputConnector, IOutputConnector{
 		Iterator<Neuron> inputNeuronIterator = inputLayer.getNeuronIterator();
 		while( inputNeuronIterator.hasNext() ){
 			Neuron inputNeuron = inputNeuronIterator.next();
-			double summa = getInputSumma(inputNeuron.getOrder());
+			double summa = getInputSumma(inputNeuron.getIndex());
 			inputNeuron.calculateActivationFunction(summa);			
 		}
 	}
@@ -107,7 +105,7 @@ public class InnerConnector implements IInputConnector, IOutputConnector{
 		Iterator<Neuron> inputNeuronIterator = inputLayer.getNeuronIterator();
 		while( inputNeuronIterator.hasNext() ){
 			Neuron inputNeuron = inputNeuronIterator.next();
-			double w = weights[outputNeuronOrder][inputNeuron.getOrder()];
+			double w = weights[outputNeuronOrder][inputNeuron.getIndex()];
 			double delta = inputNeuron.getDelta();
 			sum += w * delta;
 		}

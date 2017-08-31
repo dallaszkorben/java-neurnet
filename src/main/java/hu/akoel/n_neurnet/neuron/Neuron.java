@@ -7,19 +7,19 @@ public class Neuron {
 	protected double δ;
 	//protected double σ;
 	
-	int order = -1;
+	int index = -1;
 	IActivationFunction activationFunction = new SigmoidActivationFunction();
 
 	public void setActivationFunction(IActivationFunction activationFunction){
 		this.activationFunction = activationFunction;
 	}
 
-	public void setOrder( int order ){
-		this.order = order;
+	public void setIndex( int order ){
+		this.index = order;
 	}
 	
-	public int getOrder(){
-		return order;
+	public int getIndex(){
+		return index;
 	}
 
 	public double getDelta(){

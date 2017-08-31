@@ -22,8 +22,8 @@ public class NeuronTest extends TestCase{
 		Neuron neuron = new Neuron();
 		
 		for( int i = 0; i <= 100; i++ ){
-			neuron.setOrder( i );
-			assertEquals( i, neuron.getOrder() );
+			neuron.setIndex( i );
+			assertEquals( i, neuron.getIndex() );
 		}
 	}
 	

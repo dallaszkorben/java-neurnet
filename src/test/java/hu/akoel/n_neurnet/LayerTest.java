@@ -40,7 +40,7 @@ public class LayerTest extends TestCase{
 		int i = 0;
 		Iterator<Neuron> iterator = layer.getNeuronIterator();
 		while( iterator.hasNext() ){
-			assertEquals(i, iterator.next().getOrder() );
+			assertEquals(i, iterator.next().getIndex() );
 			i++;
 		}
 		

@@ -9,7 +9,7 @@ public class Layer {
 	ArrayList<Neuron> neuronList = new ArrayList<Neuron>();
 
 	public void addNeuron( Neuron neuron ){
-		neuron.setOrder( neuronList.size() );
+		neuron.setIndex( neuronList.size() );
 		neuronList.add( neuron );
 	}
 	
