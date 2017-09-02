@@ -24,7 +24,7 @@ public class InnerConnectorTest extends TestCase{
 	}
 
 	public static Test suite(){
-		return new TestSuite( InnerConnectorTest.class );
+		return new TestSuite( InputConnectorTest.class );
 	}
 
 	public void test_getWeight_Method_And_ResetWeightStrategy(){

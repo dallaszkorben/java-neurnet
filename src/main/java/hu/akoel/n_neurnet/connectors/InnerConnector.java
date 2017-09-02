@@ -57,7 +57,7 @@ public class InnerConnector implements IInputConnector, IOutputConnector{
 		Iterator<Neuron> neuronIterator = outputLayer.getNeuronIterator();
 		while( neuronIterator.hasNext() ){
 			Neuron outputNeuron = neuronIterator.next();
-			summa += outputNeuron.getSigma() * getInputWeight(outputNeuron.getIndex(), inputNeuronOrder);
+			summa += outputNeuron.getSigma() * weights[outputNeuron.getIndex()][inputNeuronOrder];
 		}		
 		return summa;	
 	}
@@ -98,34 +98,26 @@ public class InnerConnector implements IInputConnector, IOutputConnector{
 	//
 	//--- OUTPUT ---
 	//	
-	public void calculateOutputDelta(int outputNeuronOrder) {
+	public void calculateOutputDelta(int outputNeuronIndex) {
 		
 		//Neuron outputNeuron
 		double sum = 0;
 		Iterator<Neuron> inputNeuronIterator = inputLayer.getNeuronIterator();
 		while( inputNeuronIterator.hasNext() ){
 			Neuron inputNeuron = inputNeuronIterator.next();
-			double w = weights[outputNeuronOrder][inputNeuron.getIndex()];
+			double w = weights[outputNeuronIndex][inputNeuron.getIndex()];
 			double delta = inputNeuron.getDelta();
 			sum += w * delta;
 		}
-		Neuron outputNeuron = outputLayer.getNeuron(outputNeuronOrder);
+		Neuron outputNeuron = outputLayer.getNeuron(outputNeuronIndex);
 		double delta = sum * outputNeuron.getDerivateSigmaBySum();
 		outputNeuron.setDelta(delta);
 	}
 
-
-	
-	//
-	//
-	//
-	
-
-
-
-
-
-		
-	
+	public void calculateOutputDeltas() {
+		for( int i = 0; i < outputLayer.getSize(); i++ ){
+			calculateOutputDelta( i );
+		}		
+	}
 
 }
