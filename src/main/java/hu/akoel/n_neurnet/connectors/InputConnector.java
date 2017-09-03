@@ -30,7 +30,7 @@ public class InputConnector implements IInputConnector{
 
 	public void resetWeights() {
 		for( int j = 0; j < inputLayer.getSize(); j++ ){			
-			weights[j] = resetWeightStrategy.getWeight( -1, j );
+			weights[j] = resetWeightStrategy.getWeight( null, inputLayer.getNeuron(j) );
 		}					
 	}
 

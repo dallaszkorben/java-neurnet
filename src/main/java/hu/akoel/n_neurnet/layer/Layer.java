@@ -24,4 +24,8 @@ public class Layer {
 	public Neuron getNeuron( int order ){
 		return neuronList.get(order);
 	}
+	
+	public int getNeuronIndex( Neuron neuron ){
+		return neuronList.indexOf( neuron );
+	}
 }

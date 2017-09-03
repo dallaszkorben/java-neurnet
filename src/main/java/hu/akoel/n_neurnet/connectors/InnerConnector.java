@@ -42,7 +42,7 @@ public class InnerConnector implements IInputConnector, IOutputConnector{
 		
 		for( int i = 0; i < outputLayer.getSize(); i++){			
 			for( int j = 0; j < inputLayer.getSize(); j++ ){			
-				weights[i][j] = resetWeightStrategy.getWeight( i, j );
+				weights[i][j] = resetWeightStrategy.getWeight( outputLayer.getNeuron(i), inputLayer.getNeuron(j) );
 			}			
 		}		
 	}

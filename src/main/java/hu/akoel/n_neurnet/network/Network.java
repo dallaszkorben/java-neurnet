@@ -7,27 +7,29 @@ import hu.akoel.n_neurnet.connectors.InnerConnector;
 import hu.akoel.n_neurnet.connectors.InputConnector;
 import hu.akoel.n_neurnet.connectors.OutputConnector;
 import hu.akoel.n_neurnet.layer.Layer;
-import hu.akoel.n_neurnet.listeners.InputListener;
-import hu.akoel.n_neurnet.listeners.OutputListener;
+import hu.akoel.n_neurnet.listeners.DataListener;
+import hu.akoel.n_neurnet.listeners.ICycleListener;
+import hu.akoel.n_neurnet.neuron.Neuron;
 import hu.akoel.n_neurnet.strategies.IResetWeightStrategy;
 import hu.akoel.n_neurnet.strategies.RandomResetWeightStrategy;
+import hu.akoel.neurnet.neuron.OutputNeuron;
+
 
 public class Network {
+	private ICycleListener trainingCycleListener = null;
 	private IResetWeightStrategy resetWeightStrategy = new RandomResetWeightStrategy();
 	private ArrayList<Layer> layerList = new ArrayList<Layer>();	
-	private InputListener inputListener;
-	private OutputListener outputListener;
+	private DataListener dataListener;
 	private double α = 0.3;
 	private double β = 1;
 	private int maxTrainCycle = 1;
 	
 	private InputConnector inputConnector;
 	private OutputConnector outputConnector;
-	private ArrayList<InnerConnector> innerConnectorList;
+	private ArrayList<InnerConnector> innerConnectorList = new ArrayList<InnerConnector>();
 
-	public Network( InputListener inputListener, OutputListener outputListener ){
-		this.inputListener = inputListener;
-		this.outputListener = outputListener;
+	public Network( DataListener dataListener ){
+		this.dataListener = dataListener;
 	}
 
 	public void setLearningRate( double α ){
@@ -61,18 +63,25 @@ public class Network {
 	public void setResetWeightStrategy(IResetWeightStrategy resetWeightStrategy) {
 		this.resetWeightStrategy = resetWeightStrategy;
 		
-		if( null != inputConnector ){
+/*		if( null != inputConnector ){
 			this.inputConnector.setResetWeightStrategy(resetWeightStrategy);
 		}
 		for( InnerConnector innerConnector: innerConnectorList ){
 			innerConnector.setResetWeightStrategy(resetWeightStrategy);
 		}
+*/				
+	}
+
+	public void setTrainingCycleListener( ICycleListener cycleListener ){
+		this.trainingCycleListener = cycleListener;
 	}
 	
-	public void fixConnections(){
-		inputConnector = new InputConnector( inputListener, layerList.get(0) );
+	public void initialize(){
+		inputConnector = new InputConnector( dataListener, layerList.get(0) );
 		inputConnector.setResetWeightStrategy(resetWeightStrategy);
-		outputConnector = new OutputConnector( layerList.get( layerList.size() - 1 ), outputListener );
+		inputConnector.resetWeights();
+		
+		outputConnector = new OutputConnector( layerList.get( layerList.size() - 1 ), dataListener );
 		innerConnectorList = new ArrayList<InnerConnector>();
 		
 		Iterator<Layer> layerIterator = layerList.iterator();
@@ -82,26 +91,71 @@ public class Network {
 			if( null != previousLayer ){
 				InnerConnector innerConnector = new InnerConnector( previousLayer, actualLayer );
 				innerConnector.setResetWeightStrategy(resetWeightStrategy);
+				innerConnector.resetWeights();
+				
 				innerConnectorList.add(innerConnector);
 			}
 			previousLayer = actualLayer;
 		}
 	}
 	
-	public void executeOneCycle(){
-		
-		//--- 1. step ---
-		//--- Calculate Sigma
+	public void executeTraining( double maxTotalMeanSquareError ){
+	
+		//Run the training again and again until the error is less then a certain value
+		for( int i = 0; i <= maxTrainCycle; i++ ){
+			
+			double squareError = 0;
 
-		//--- Step 2. ---
-		//--- Mean Square Error calculation
+			//Starts Training data from begining
+			dataListener.reset();
+			while( dataListener.hasNext() ){
 
-		//--- Step 3. ---
-		//--- Calculate Delta ---
+				//Takes the next Training data
+				dataListener.takeNext();		
 		
-		//--- Step 4. ---
-		//--- Calculate Weight ---
+				//--- 1. step ---
+				//--- Calculate Sigma
+				inputConnector.calculateInputSigmas();
+				for( InnerConnector innerConnector: innerConnectorList ){
+					innerConnector.calculateInputSigmas();
+				}
+
+				//--- Step 2. ---
+				//--- Mean Square Error calculation
+
+				//--- Step 3. ---
+				//--- Calculate Delta ---
+				outputConnector.calculateOutputDeltas();
+				for( int j = innerConnectorList.size() - 1; j >= 0; j--){			
+					//for( InnerConnector innerConnector: innerConnectorList ){
+					InnerConnector innerConnector = innerConnectorList.get( j );
+					innerConnector.calculateOutputDeltas();
+				}
 		
+				//--- Step 4. ---
+				//--- Calculate Weight ---
+				inputConnector.calculateInputWeights(α, β);
+				for( InnerConnector innerConnector: innerConnectorList ){
+					innerConnector.calculateInputWeights(α, β);
+				}
+				
+				//Error Calculation
+				squareError += outputConnector.getMeanSquareError();
+
+			}
+			
+			squareError /= dataListener.getSize();
+			
+			if( null != trainingCycleListener )
+				trainingCycleListener.handlerError( i, squareError);
+		
+			if( squareError <= maxTotalMeanSquareError ){				
+				break;
+			}
+		}
+	}
+	
+	public void executeTest( DataListener dataListener ){
 		
 	}
 }

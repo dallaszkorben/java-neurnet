@@ -74,9 +74,8 @@ public class InputConnectorTest extends TestCase{
 
 			InputConnector inputConnector = new InputConnector( new MyInputListener(), inputLayer );
 			inputConnector.setResetWeightStrategy( new IResetWeightStrategy() {
-				public double getWeight(int outputNeuronOrder, int inputNeuronOrder) {
-					return dataPairs[ staticCycle ][ inputNeuronOrder ];
-				}
+				public double getWeight(Neuron outputNeuron, Neuron inputNeuron) {
+					return dataPairs[ staticCycle ][ inputNeuron.getIndex() ];				}
 			});
 
 			inputConnector.resetWeights();
@@ -143,9 +142,8 @@ public class InputConnectorTest extends TestCase{
 			
 			InputConnector inputConnector = new InputConnector( inputListener, inputLayer );
 			inputConnector.setResetWeightStrategy( new IResetWeightStrategy() {
-				public double getWeight(int outputNeuronOrder, int inputNeuronOrder) {
-					return dataPairs[staticCycle][1][inputNeuronOrder];
-				}
+				public double getWeight(Neuron outputNeuron, Neuron inputNeuron) {
+					return dataPairs[staticCycle][1][inputNeuron.getIndex()];				}
 			});
 			inputConnector.resetWeights();
 							
@@ -194,9 +192,8 @@ public class InputConnectorTest extends TestCase{
 			inputListener.setInput( new double[]{dataPairs[staticCycle][0][0], dataPairs[staticCycle][0][1], dataPairs[staticCycle][0][2]} );
 			InputConnector inputConnector = new InputConnector( inputListener, inputLayer );
 			inputConnector.setResetWeightStrategy( new IResetWeightStrategy() {
-				public double getWeight(int outputNeuronOrder, int inputNeuronIndex) {
-					return dataPairs[staticCycle][1][inputNeuronIndex];
-				}
+				public double getWeight(Neuron outputNeuron, Neuron inputNeuron) {
+					return dataPairs[staticCycle][1][inputNeuron.getIndex()];				}
 			});
 			inputConnector.resetWeights();
 
@@ -241,8 +238,8 @@ public class InputConnectorTest extends TestCase{
 			InputConnector inputConnector = new InputConnector( inputListener, inputLayer );
 
 			inputConnector.setResetWeightStrategy( new IResetWeightStrategy() {
-				public double getWeight(int outputNeuronOrder, int inputNeuronIndex) {
-					return dataPairs[staticCycle][3][inputNeuronIndex];
+				public double getWeight(Neuron outputNeuron, Neuron inputNeuron) {
+					return dataPairs[staticCycle][3][inputNeuron.getIndex()];
 				}
 			});
 			inputConnector.resetWeights();
@@ -286,8 +283,8 @@ public class InputConnectorTest extends TestCase{
 			InputConnector inputConnector = new InputConnector( inputListener, inputLayer );
 	
 			inputConnector.setResetWeightStrategy( new IResetWeightStrategy() {
-				public double getWeight(int outputNeuronOrder, int inputNeuronIndex) {
-					return dataPairs[staticCycle][3][inputNeuronIndex];
+				public double getWeight(Neuron outputNeuron, Neuron inputNeuron) {
+					return dataPairs[staticCycle][3][inputNeuron.getIndex()];
 				}
 			});
 			inputConnector.resetWeights();

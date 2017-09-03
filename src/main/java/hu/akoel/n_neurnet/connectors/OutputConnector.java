@@ -1,8 +1,11 @@
 package hu.akoel.n_neurnet.connectors;
 
+import java.util.Iterator;
+
 import hu.akoel.n_neurnet.layer.Layer;
 import hu.akoel.n_neurnet.listeners.OutputListener;
 import hu.akoel.n_neurnet.neuron.Neuron;
+import hu.akoel.neurnet.neuron.OutputNeuron;
 
 public class OutputConnector implements IOutputConnector{
 	private OutputListener outputListener;
@@ -30,5 +33,18 @@ public class OutputConnector implements IOutputConnector{
 		}		
 	}
 
+	public double getMeanSquareError(){
+		double squareError = 0;
+	
+		Iterator<Neuron> neuronIterator = outputLayer.getNeuronIterator();
+		while( neuronIterator.hasNext() ){
+			Neuron actualNeuron = neuronIterator.next();			
+			squareError += Math.pow( actualNeuron.getSigma() - outputListener.getExpectedOutput( actualNeuron.getIndex() ), 2 );
+			
+		}
+		squareError /= outputLayer.getSize();
+	
+		return squareError;
+	}
 
 }
