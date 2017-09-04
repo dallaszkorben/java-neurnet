@@ -2,22 +2,25 @@ package hu.akoel.n_neurnet.connectors;
 
 import java.util.Iterator;
 
+import hu.akoel.n_neurnet.handlers.OutputDataHandler;
 import hu.akoel.n_neurnet.layer.Layer;
-import hu.akoel.n_neurnet.listeners.OutputListener;
 import hu.akoel.n_neurnet.neuron.Neuron;
-import hu.akoel.neurnet.neuron.OutputNeuron;
 
 public class OutputConnector implements IOutputConnector{
-	private OutputListener outputListener;
+	private OutputDataHandler outputDataHandler;
 	private Layer outputLayer;
 
-	public OutputConnector( Layer outputLayer, OutputListener outputListener ){	
+	public OutputConnector( Layer outputLayer ){	
 		this.outputLayer = outputLayer;
-		this.outputListener = outputListener;
+		//this.outputDataHandler = outputDataHandler;
+	}
+	
+	public void setOutputDataHandler( OutputDataHandler outputDataHandler ){
+		this.outputDataHandler = outputDataHandler;
 	}
 	
 	public double getExpectedValue( int outputNeuronIndex ){
-		return outputListener.getExpectedOutput(outputNeuronIndex);
+		return outputDataHandler.getExpectedOutput(outputNeuronIndex);
 	}
 	
 	public void calculateOutputDelta(int outputNeuronIndex) {
@@ -39,12 +42,16 @@ public class OutputConnector implements IOutputConnector{
 		Iterator<Neuron> neuronIterator = outputLayer.getNeuronIterator();
 		while( neuronIterator.hasNext() ){
 			Neuron actualNeuron = neuronIterator.next();			
-			squareError += Math.pow( actualNeuron.getSigma() - outputListener.getExpectedOutput( actualNeuron.getIndex() ), 2 );
+			squareError += Math.pow( actualNeuron.getSigma() - outputDataHandler.getExpectedOutput( actualNeuron.getIndex() ), 2 );
 			
 		}
 		squareError /= outputLayer.getSize();
 	
 		return squareError;
+	}
+	
+	public Layer getOutputLayer(){
+		return outputLayer;
 	}
 
 }

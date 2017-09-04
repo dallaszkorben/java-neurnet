@@ -2,26 +2,47 @@ package hu.akoel.n_neurnet.connectors;
 
 import java.util.Iterator;
 
+import hu.akoel.n_neurnet.handlers.InputDataHandler;
 import hu.akoel.n_neurnet.layer.Layer;
-import hu.akoel.n_neurnet.listeners.InputListener;
 import hu.akoel.n_neurnet.neuron.Neuron;
 import hu.akoel.n_neurnet.strategies.IResetWeightStrategy;
 import hu.akoel.n_neurnet.strategies.RandomResetWeightStrategy;
+import hu.akoel.n_neurnet.weightmessage.WeightInputLayer;
+import hu.akoel.n_neurnet.weightmessage.WeightInputNeuron;
+import hu.akoel.n_neurnet.weightmessage.WeightOutputNeuron;
 
 public class InputConnector implements IInputConnector{
 	private IResetWeightStrategy resetWeightStrategy = new RandomResetWeightStrategy();
-	private InputListener inputListener;
+	private InputDataHandler inputDataHandler;
 	private Layer inputLayer;
 	private double[] weights;
 
-	public InputConnector( InputListener inputListener, Layer inputLayer ){
-		this.inputListener = inputListener;
+	public InputConnector( Layer inputLayer ){
+		//this.inputDataHandler = inputDataHandler;
 		this.inputLayer = inputLayer;
 		weights = new double[inputLayer.getSize()];
 	}
 	
+	public WeightInputLayer getWeights() {
+		WeightInputLayer wil = new WeightInputLayer(null, inputLayer);
+		
+		for( int i = 0; i < inputLayer.getSize(); i++ ){
+			WeightInputNeuron win = new WeightInputNeuron( i );
+			
+			WeightOutputNeuron won = new WeightOutputNeuron(weights[i], -1);
+			win.addOutputNeuron(won);
+			
+			wil.addInputNeuron(win);
+		}
+		return wil;
+	}
+	
+	public void setInputDataHandler( InputDataHandler inputDataHandler ){
+		this.inputDataHandler = inputDataHandler;
+	}
+	
 	public double getInputValue( int inputNeuronIndex ){
-		return inputListener.getInput( inputNeuronIndex );
+		return inputDataHandler.getInput( inputNeuronIndex );
 	}
 	
 	public void setResetWeightStrategy(IResetWeightStrategy resetWeightStrategy) {

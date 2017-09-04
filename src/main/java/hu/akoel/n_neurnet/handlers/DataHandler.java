@@ -1,6 +1,6 @@
-package hu.akoel.n_neurnet.listeners;
+package hu.akoel.n_neurnet.handlers;
 
-public abstract class DataListener implements InputListener, OutputListener {
+public abstract class DataHandler implements InputDataHandler, OutputDataHandler {
 
 	abstract public boolean hasNext();
 	

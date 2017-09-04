@@ -1,22 +1,13 @@
 package hu.akoel.n_neurnet;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
-import hu.akoel.n_neurnet.InnerConnectorTest.ForDefineOutputValue_ActivationFunction;
 import hu.akoel.n_neurnet.activationfunctions.IActivationFunction;
-import hu.akoel.n_neurnet.connectors.InnerConnector;
-import hu.akoel.n_neurnet.connectors.InputConnector;
 import hu.akoel.n_neurnet.connectors.OutputConnector;
+import hu.akoel.n_neurnet.handlers.OutputDataHandler;
 import hu.akoel.n_neurnet.layer.Layer;
-import hu.akoel.n_neurnet.listeners.InputListener;
-import hu.akoel.n_neurnet.listeners.OutputListener;
 import hu.akoel.n_neurnet.neuron.Neuron;
-import hu.akoel.n_neurnet.strategies.IResetWeightStrategy;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import static org.junit.Assert.assertNotEquals;
 	
 public class OutputConnectorTest extends TestCase{ 
 
@@ -47,7 +38,7 @@ public class OutputConnectorTest extends TestCase{
 		}
 	};
 	
-	class MyOutputListener implements OutputListener {
+	class MyOutputDataHandler implements OutputDataHandler {
 		private double[] expectedOutputValues;			
 		public void setExpectedOutputValues( double[] expecedOutputValues ){
 			this.expectedOutputValues = expecedOutputValues;
@@ -78,12 +69,13 @@ public class OutputConnectorTest extends TestCase{
 			outputLayer.addNeuron(neuron);		
 		}
 
-		MyOutputListener outputListener = new MyOutputListener();
-		OutputConnector outputConnector = new OutputConnector( outputLayer, outputListener );
+		MyOutputDataHandler outputDataHandler = new MyOutputDataHandler();
+		OutputConnector outputConnector = new OutputConnector( outputLayer );
+		outputConnector.setOutputDataHandler(outputDataHandler);
 
 		for( staticCycle = 0; staticCycle < dataPairs.length; staticCycle ++ ){		
 
-			outputListener.setExpectedOutputValues( new double[]{dataPairs[staticCycle][2][0], dataPairs[staticCycle][2][1], dataPairs[staticCycle][2][2]});
+			outputDataHandler.setExpectedOutputValues( new double[]{dataPairs[staticCycle][2][0], dataPairs[staticCycle][2][1], dataPairs[staticCycle][2][2]});
 
 			for( int i = 0; i < outputLayerSize; i++ ){
 				Neuron neuron = outputLayer.getNeuron( i );
@@ -122,12 +114,13 @@ public class OutputConnectorTest extends TestCase{
 			outputLayer.addNeuron(neuron);		
 		}
 
-		MyOutputListener outputListener = new MyOutputListener();
-		OutputConnector outputConnector = new OutputConnector( outputLayer, outputListener );
+		MyOutputDataHandler outputDataHandler = new MyOutputDataHandler();
+		OutputConnector outputConnector = new OutputConnector( outputLayer );
+		outputConnector.setOutputDataHandler(outputDataHandler);
 
 		for( staticCycle = 0; staticCycle < dataPairs.length; staticCycle ++ ){		
 
-			outputListener.setExpectedOutputValues( new double[]{dataPairs[staticCycle][2][0], dataPairs[staticCycle][2][1], dataPairs[staticCycle][2][2]});
+			outputDataHandler.setExpectedOutputValues( new double[]{dataPairs[staticCycle][2][0], dataPairs[staticCycle][2][1], dataPairs[staticCycle][2][2]});
 
 			for( int i = 0; i < outputLayerSize; i++ ){
 				Neuron neuron = outputLayer.getNeuron( i );

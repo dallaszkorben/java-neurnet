@@ -5,8 +5,8 @@ import java.util.Iterator;
 
 import hu.akoel.n_neurnet.activationfunctions.IActivationFunction;
 import hu.akoel.n_neurnet.connectors.InputConnector;
+import hu.akoel.n_neurnet.handlers.InputDataHandler;
 import hu.akoel.n_neurnet.layer.Layer;
-import hu.akoel.n_neurnet.listeners.InputListener;
 import hu.akoel.n_neurnet.neuron.Neuron;
 import hu.akoel.n_neurnet.strategies.IResetWeightStrategy;
 import junit.framework.Test;
@@ -41,7 +41,7 @@ public class InputConnectorTest extends TestCase{
 		}
 	};
 	
-	class MyInputListener implements InputListener {
+	class MyInputDataHandler implements InputDataHandler {
 		private double[] inputValues;			
 		public void setInput( double[] inputValues ){
 			this.inputValues = inputValues;
@@ -72,7 +72,8 @@ public class InputConnectorTest extends TestCase{
 
 		for( staticCycle = 0; staticCycle < dataPairs.length; staticCycle ++ ){		
 
-			InputConnector inputConnector = new InputConnector( new MyInputListener(), inputLayer );
+			InputConnector inputConnector = new InputConnector( inputLayer );
+			inputConnector.setInputDataHandler( new MyInputDataHandler() );
 			inputConnector.setResetWeightStrategy( new IResetWeightStrategy() {
 				public double getWeight(Neuron outputNeuron, Neuron inputNeuron) {
 					return dataPairs[ staticCycle ][ inputNeuron.getIndex() ];				}
@@ -98,7 +99,8 @@ public class InputConnectorTest extends TestCase{
 			inputLayer.addNeuron(neuron);
 		}
 
-		InputConnector inputConnector = new InputConnector( new MyInputListener(), inputLayer );
+		InputConnector inputConnector = new InputConnector( inputLayer );
+		inputConnector. setInputDataHandler( new MyInputDataHandler() );
 		
 		ArrayList<Double> weights = new ArrayList<Double>();
 		for( int j = 0; j < inputLayerSize; j++ ){	
@@ -137,10 +139,11 @@ public class InputConnectorTest extends TestCase{
 				inputLayer.addNeuron(neuron);
 			}
 
-			MyInputListener inputListener = new MyInputListener();
-			inputListener.setInput( new double[]{dataPairs[staticCycle][0][0], dataPairs[staticCycle][0][1], dataPairs[staticCycle][0][2]} );
+			MyInputDataHandler inputDataHandler = new MyInputDataHandler();
+			inputDataHandler.setInput( new double[]{dataPairs[staticCycle][0][0], dataPairs[staticCycle][0][1], dataPairs[staticCycle][0][2]} );
 			
-			InputConnector inputConnector = new InputConnector( inputListener, inputLayer );
+			InputConnector inputConnector = new InputConnector( inputLayer );
+			inputConnector.setInputDataHandler( inputDataHandler );
 			inputConnector.setResetWeightStrategy( new IResetWeightStrategy() {
 				public double getWeight(Neuron outputNeuron, Neuron inputNeuron) {
 					return dataPairs[staticCycle][1][inputNeuron.getIndex()];				}
@@ -188,9 +191,10 @@ public class InputConnectorTest extends TestCase{
 				inputLayer.addNeuron(neuron);
 			}
 			
-			MyInputListener inputListener = new MyInputListener();
-			inputListener.setInput( new double[]{dataPairs[staticCycle][0][0], dataPairs[staticCycle][0][1], dataPairs[staticCycle][0][2]} );
-			InputConnector inputConnector = new InputConnector( inputListener, inputLayer );
+			MyInputDataHandler inputDataHandler = new MyInputDataHandler();
+			inputDataHandler.setInput( new double[]{dataPairs[staticCycle][0][0], dataPairs[staticCycle][0][1], dataPairs[staticCycle][0][2]} );
+			InputConnector inputConnector = new InputConnector( inputLayer );
+			inputConnector.setInputDataHandler( inputDataHandler );
 			inputConnector.setResetWeightStrategy( new IResetWeightStrategy() {
 				public double getWeight(Neuron outputNeuron, Neuron inputNeuron) {
 					return dataPairs[staticCycle][1][inputNeuron.getIndex()];				}
@@ -233,9 +237,10 @@ public class InputConnectorTest extends TestCase{
 				inputLayer.addNeuron(neuron);
 			}
 
-			MyInputListener inputListener = new MyInputListener();
-			inputListener.setInput( new double[]{dataPairs[staticCycle][0][0], dataPairs[staticCycle][0][1], dataPairs[staticCycle][0][2]} );
-			InputConnector inputConnector = new InputConnector( inputListener, inputLayer );
+			MyInputDataHandler inputDataHandler = new MyInputDataHandler();
+			inputDataHandler.setInput( new double[]{dataPairs[staticCycle][0][0], dataPairs[staticCycle][0][1], dataPairs[staticCycle][0][2]} );
+			InputConnector inputConnector = new InputConnector( inputLayer );
+			inputConnector.setInputDataHandler(inputDataHandler);
 
 			inputConnector.setResetWeightStrategy( new IResetWeightStrategy() {
 				public double getWeight(Neuron outputNeuron, Neuron inputNeuron) {
@@ -278,9 +283,10 @@ public class InputConnectorTest extends TestCase{
 				inputLayer.addNeuron(neuron);
 			}
 
-			MyInputListener inputListener = new MyInputListener();
-			inputListener.setInput( new double[]{dataPairs[staticCycle][0][0], dataPairs[staticCycle][0][1], dataPairs[staticCycle][0][2]} );
-			InputConnector inputConnector = new InputConnector( inputListener, inputLayer );
+			MyInputDataHandler inputDataHandler = new MyInputDataHandler();
+			inputDataHandler.setInput( new double[]{dataPairs[staticCycle][0][0], dataPairs[staticCycle][0][1], dataPairs[staticCycle][0][2]} );
+			InputConnector inputConnector = new InputConnector( inputLayer );
+			inputConnector.setInputDataHandler(inputDataHandler);
 	
 			inputConnector.setResetWeightStrategy( new IResetWeightStrategy() {
 				public double getWeight(Neuron outputNeuron, Neuron inputNeuron) {

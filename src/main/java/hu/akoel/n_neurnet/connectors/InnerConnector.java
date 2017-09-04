@@ -6,6 +6,9 @@ import hu.akoel.n_neurnet.layer.Layer;
 import hu.akoel.n_neurnet.neuron.Neuron;
 import hu.akoel.n_neurnet.strategies.IResetWeightStrategy;
 import hu.akoel.n_neurnet.strategies.RandomResetWeightStrategy;
+import hu.akoel.n_neurnet.weightmessage.WeightInputLayer;
+import hu.akoel.n_neurnet.weightmessage.WeightInputNeuron;
+import hu.akoel.n_neurnet.weightmessage.WeightOutputNeuron;
 
 public class InnerConnector implements IInputConnector, IOutputConnector{
 	private IResetWeightStrategy resetWeightStrategy = new RandomResetWeightStrategy();
@@ -34,6 +37,25 @@ public class InnerConnector implements IInputConnector, IOutputConnector{
 	//
 	//--- INPUT ---
 	//
+	public WeightInputLayer getWeights() {
+
+		WeightInputLayer wil = new WeightInputLayer(outputLayer, inputLayer);
+		
+		for( int i = 0; i < inputLayer.getSize(); i++ ){
+			
+			WeightInputNeuron win = new WeightInputNeuron( i );
+			
+			for( int j = 0; j < outputLayer.getSize(); j++ ){
+			
+				WeightOutputNeuron won = new WeightOutputNeuron( weights[j][i], j );
+				win.addOutputNeuron( won );				
+			}
+			
+			wil.addInputNeuron(win);
+		}
+		return wil;
+	}
+	
 	public void setResetWeightStrategy( IResetWeightStrategy resetWeightStrategy) {
 		this.resetWeightStrategy = resetWeightStrategy;
 	}

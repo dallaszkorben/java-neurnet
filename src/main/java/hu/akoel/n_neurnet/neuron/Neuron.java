@@ -4,7 +4,7 @@ import hu.akoel.n_neurnet.activationfunctions.IActivationFunction;
 import hu.akoel.n_neurnet.activationfunctions.SigmoidActivationFunction;
 
 public class Neuron {
-	protected double δ;
+	protected double δ=0;
 	//protected double σ;
 	
 	int index = -1;
