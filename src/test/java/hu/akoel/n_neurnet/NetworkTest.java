@@ -8,10 +8,8 @@ import hu.akoel.n_neurnet.layer.Layer;
 import hu.akoel.n_neurnet.handlers.DataHandler;
 import hu.akoel.n_neurnet.network.Network;
 import hu.akoel.n_neurnet.neuron.Neuron;
+import hu.akoel.n_neurnet.resultcontainers.IResultContainer;
 import hu.akoel.n_neurnet.strategies.IResetWeightStrategy;
-import hu.akoel.n_neurnet.weightmessage.WeightInputLayer;
-import hu.akoel.n_neurnet.weightmessage.WeightInputNeuron;
-import hu.akoel.n_neurnet.weightmessage.WeightOutputNeuron;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -171,32 +169,27 @@ public class NetworkTest extends TestCase{
 			myNetwork.executeTraining(true, myTrainingDataListener, 0.00005);
 			
 			
-			ArrayList<WeightInputLayer> weightArray = myNetwork.getWeights();
-			Iterator<WeightInputLayer> wilIterator = weightArray.iterator();
+			ArrayList<IResultContainer> weightArray = myNetwork.getResultContainer();
+			Iterator<IResultContainer> wilIterator = weightArray.iterator();
 			while( wilIterator.hasNext() ){				
-				WeightInputLayer wil = wilIterator.next();
+				IResultContainer wil = wilIterator.next();
 				
-				System.err.println( "layer: " + wil.inputLayer );				
+				System.err.println( "layer: " + wil.getInputLayer() );				
 				
-				ArrayList<WeightInputNeuron> winList = wil.inputNeuronList;
-				Iterator<WeightInputNeuron> winIterator = winList.iterator();
-				while( winIterator.hasNext() ){
-					WeightInputNeuron win = winIterator.next();
+				wil.reset();
+				while( wil.hasNextNeuron() ){
 					
-					System.err.println("  Neuron: " + win.inputNeuronIndex );
+					Neuron neruron = wil.getNextNeuron();
+					System.err.println("  Neuron: " + " idx: " + neruron.getIndex() );
 					
-					ArrayList<WeightOutputNeuron> wonList = win.outputNeurons;
-					Iterator<WeightOutputNeuron> wonIterator = wonList.iterator();
-					while( wonIterator.hasNext() ){
-						WeightOutputNeuron won = wonIterator.next();
+					while( wil.hasNextWeight() ){
 						
-						System.err.println("    w: " + won.weight );
+						System.err.println("    w: " + wil.getNextWeight() );
+						
 					}
 					
 				}
 			}
-			
-
 		}
 	}
 	

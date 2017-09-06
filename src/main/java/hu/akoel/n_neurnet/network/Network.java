@@ -10,10 +10,10 @@ import hu.akoel.n_neurnet.layer.Layer;
 import hu.akoel.n_neurnet.handlers.DataHandler;
 import hu.akoel.n_neurnet.listeners.ICycleListener;
 import hu.akoel.n_neurnet.neuron.Neuron;
+import hu.akoel.n_neurnet.resultcontainers.IResultContainer;
+import hu.akoel.n_neurnet.resultcontainers.InnerLayerResultContainer;
 import hu.akoel.n_neurnet.strategies.IResetWeightStrategy;
 import hu.akoel.n_neurnet.strategies.RandomResetWeightStrategy;
-import hu.akoel.n_neurnet.weightmessage.WeightInputLayer;
-
 
 public class Network {
 	private ICycleListener trainingCycleListener = null;
@@ -80,15 +80,15 @@ public class Network {
 		outputConnector.setOutputDataHandler( dataHandler );			
 	}
 	
-	public ArrayList<WeightInputLayer> getWeights(){		
+	public ArrayList<IResultContainer> getResultContainer(){		
 		
-		ArrayList<WeightInputLayer> outWeights = new ArrayList<WeightInputLayer>();
+		ArrayList<IResultContainer> outWeights = new ArrayList<IResultContainer>();
 	
-		outWeights.add( inputConnector.getWeights() );
+		outWeights.add( inputConnector.getResultContainer() );
 		Iterator<InnerConnector> innerConnectorIterator = innerConnectorList.iterator();
 		while( innerConnectorIterator.hasNext() ){
 			InnerConnector ic = innerConnectorIterator.next();
-			outWeights.add( ic.getWeights() );
+			outWeights.add( ic.getResultContainer() );
 		}
 		return outWeights;
 	}
