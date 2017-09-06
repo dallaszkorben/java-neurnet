@@ -8,7 +8,7 @@ import hu.akoel.n_neurnet.layer.Layer;
 import hu.akoel.n_neurnet.handlers.DataHandler;
 import hu.akoel.n_neurnet.network.Network;
 import hu.akoel.n_neurnet.neuron.Neuron;
-import hu.akoel.n_neurnet.resultcontainers.IResultContainer;
+import hu.akoel.n_neurnet.resultiterator.IResultIterator;
 import hu.akoel.n_neurnet.strategies.IResetWeightStrategy;
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -136,7 +136,92 @@ public class NetworkTest extends TestCase{
 		return myNetwork;
 	}
 	
-	public void test_calculateInputWeights_Method(){	
+	public void test_SettersGetters(){	
+		final double[][][][] dataPairs = {
+				//{I},      {O},    	 {w01 w10 w11 w20},       {cycle, α, β}
+				{
+					{{0.1}, {0.15}, {0.2}, {0.3}, {0.35}, {0.4}, {0.45}, {0.5}}, 
+					{{0.1}, {0.15}, {0.2}, {0.3}, {0.35}, {0.4}, {0.45}, {0.5}},  
+					{{1.0}, {2.0, 3.0}, {4.0, 5.0}}, 
+					{{1000.0, 0.0, 0.0}, {253.0, 0.99, 0.0}, {253.0, 0.0, 0.99}, {253.0, 0.45, 0.32}} 
+				},					
+		};
+
+		for( staticCycle = 0; staticCycle < dataPairs.length; staticCycle++ ){
+
+			Network myNetwork = getGenaralNeuron(dataPairs);
+			
+			for( int i = 0; i < dataPairs[staticCycle][3].length; i++){
+				myNetwork.setMaxTrainCycle((int)dataPairs[staticCycle][3][i][0]);
+				myNetwork.setLearningRate(dataPairs[staticCycle][3][i][1]);
+				myNetwork.setMomentum(dataPairs[staticCycle][3][i][2]);
+				
+				assertEquals( (int)dataPairs[staticCycle][3][i][0], myNetwork.getMaxTrainCycle() );
+				assertEquals( dataPairs[staticCycle][3][i][1], myNetwork.getLearningRate() );
+				assertEquals( dataPairs[staticCycle][3][i][2], myNetwork.getMomentum() );
+			}
+		}		
+	}
+	
+	public void test_executeTraining_Method(){	
+		
+		final double[][][][] inputDataPairs = {
+				//{δi1, δi2, δi3}, {α, β}, {w1, w2, w3, w4, w5, w6, w7, w8, w9}, {σ1, σ2, σ3}
+				//{I},      {O},    	 {w01 w10 w11 w20},       {cycle}
+				{
+					{{0.1}, {0.15}, {0.2}, {0.3}, {0.35}, {0.4}, {0.45}, {0.5}}, 
+					{{0.1}, {0.15}, {0.2}, {0.3}, {0.35}, {0.4}, {0.45}, {0.5}},  
+					{{1.0}, {2.0, 3.0}, {4.0, 5.0}}, 
+					{{1000.0}}
+				},					
+		};
+		final double[][][][] outputDataPairs = {
+				//{expected w-s}
+				{
+					{{0.09955158924812021}}, {{0.6007897283660051}, {1.4952123897080412}}, {{-0.744372079095825,-0.547696937447136}},
+				},					
+		};		
+		
+		for( staticCycle = 0; staticCycle < inputDataPairs.length; staticCycle++ ){
+
+			Network myNetwork = getGenaralNeuron(inputDataPairs);
+
+			MyDataHandler myTrainingDataListener = new MyDataHandler(inputDataPairs[staticCycle][0], inputDataPairs[staticCycle][1]);
+			
+			myNetwork.setMaxTrainCycle( (int)inputDataPairs[staticCycle][3][0][0] );
+			
+			//--- that is under TEST ---
+			myNetwork.executeTraining(true, myTrainingDataListener, 0.00005);
+			
+			int layerIndex = 0;
+			ArrayList<IResultIterator> resultContainer = myNetwork.getResultContainer();
+			Iterator<IResultIterator> resultContainerIterator = resultContainer.iterator();
+			while( resultContainerIterator.hasNext() ){				
+				IResultIterator resultIterator = resultContainerIterator.next();
+				
+				//System.err.println( "layer: " + resultIterator.getInputLayer() );				
+				
+				resultIterator.reset();
+				while( resultIterator.hasNextNeuron() ){
+					
+					resultIterator.getNextNeuron();
+					//System.err.println("  Neuron: " + " idx: " + neruron.getIndex() );
+					
+					while( resultIterator.hasNextWeight() ){
+
+						double weight = resultIterator.getNextWeight();
+						assertEquals(outputDataPairs[staticCycle][layerIndex][resultIterator.getNeuronIndex()][resultIterator.getWeightIndex()], weight);
+						//System.err.println("    w: " + resultIterator.getNextWeight() );
+						
+					}					
+				}
+				layerIndex++;
+			}			
+		}
+	}
+	
+/*
+public void test_calculateInputWeights_Method(){	
 		
 		final double[][][][] dataPairs = {
 				//{δi1, δi2, δi3}, {α, β}, {w1, w2, w3, w4, w5, w6, w7, w8, w9}, {σ1, σ2, σ3}
@@ -154,44 +239,40 @@ public class NetworkTest extends TestCase{
 		for( staticCycle = 0; staticCycle < dataPairs.length; staticCycle++ ){
 
 			Network myNetwork = getGenaralNeuron(dataPairs);
+
+			//MyDataHandler myTrainingDataListener = new MyDataHandler(dataPairs[staticCycle][0], dataPairs[staticCycle][1]);
 			
-/*			myNetwork.setTrainingCycleListener( new ICycleListener() {				
-				public void handlerError(int cycleCounter, double totalMeanSquareError) {
-					if( cycleCounter % 10000 == 0 ){
-						System.err.println( totalMeanSquareError);
-					}						
-				}
-			});
-*/			
-			MyDataHandler myTrainingDataListener = new MyDataHandler(dataPairs[staticCycle][0], dataPairs[staticCycle][1]);
+			//myNetwork.setMaxTrainCycle( (int)dataPairs[staticCycle][4][0][0] );
+			//myNetwork.executeTraining(true, myTrainingDataListener, 0.00005);
 			
-			myNetwork.setMaxTrainCycle( (int)dataPairs[staticCycle][4][0][0] );
-			myNetwork.executeTraining(true, myTrainingDataListener, 0.00005);
+			myNetwork.initialize();
 			
-			
-			ArrayList<IResultContainer> weightArray = myNetwork.getResultContainer();
-			Iterator<IResultContainer> wilIterator = weightArray.iterator();
-			while( wilIterator.hasNext() ){				
-				IResultContainer wil = wilIterator.next();
+			ArrayList<IResultIterator> resultContainer = myNetwork.getResultContainer();
+			Iterator<IResultIterator> resultContainerIterator = resultContainer.iterator();
+			while( resultContainerIterator.hasNext() ){				
+				IResultIterator resultIterator = resultContainerIterator.next();
 				
-				System.err.println( "layer: " + wil.getInputLayer() );				
+				System.err.println( "layer: " + resultIterator.getInputLayer() );				
 				
-				wil.reset();
-				while( wil.hasNextNeuron() ){
+				resultIterator.reset();
+				while( resultIterator.hasNextNeuron() ){
 					
-					Neuron neruron = wil.getNextNeuron();
+					Neuron neruron = resultIterator.getNextNeuron();
 					System.err.println("  Neuron: " + " idx: " + neruron.getIndex() );
 					
-					while( wil.hasNextWeight() ){
+					while( resultIterator.hasNextWeight() ){
 						
-						System.err.println("    w: " + wil.getNextWeight() );
+						System.err.println("    w: " + resultIterator.getNextWeight() );
 						
 					}
 					
 				}
 			}
 		}
-	}
+	} 
+ 	
+ 	
+ */
 	
 	
 /*	public void sscalculateInputWeights_Method(){	

@@ -1,17 +1,17 @@
-package hu.akoel.n_neurnet.resultcontainers;
+package hu.akoel.n_neurnet.resultiterator;
 
 import hu.akoel.n_neurnet.connectors.InnerConnector;
 import hu.akoel.n_neurnet.layer.Layer;
 import hu.akoel.n_neurnet.neuron.Neuron;
 
-public class InnerLayerResultContainer implements IResultContainer{
+public class InnerLayerResultIterator implements IResultIterator{
 	public int actualNeuron = -1;
 	public int actualWeight = -1;
 	public Layer inputLayer;
 	public Layer outputLayer;
 	public double[][] weights;
 	
-	public InnerLayerResultContainer( InnerConnector innerConnector ){
+	public InnerLayerResultIterator( InnerConnector innerConnector ){
 		this.inputLayer = innerConnector.getInputLayer();
 		this.outputLayer = innerConnector.getOutputLayer();
 		
@@ -47,11 +47,11 @@ public class InnerLayerResultContainer implements IResultContainer{
 	}
 	
 	public int getNeuronIndex(){
-		return actualNeuron + 1;
+		return actualNeuron;
 	}
 	
 	public int getWeightIndex(){
-		return actualWeight + 1;
+		return actualWeight;
 	}
 	
 	public Layer getInputLayer() {

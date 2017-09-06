@@ -5,8 +5,8 @@ import java.util.Iterator;
 import hu.akoel.n_neurnet.handlers.InputDataHandler;
 import hu.akoel.n_neurnet.layer.Layer;
 import hu.akoel.n_neurnet.neuron.Neuron;
-import hu.akoel.n_neurnet.resultcontainers.IResultContainer;
-import hu.akoel.n_neurnet.resultcontainers.InputLayerResultContainer;
+import hu.akoel.n_neurnet.resultiterator.IResultIterator;
+import hu.akoel.n_neurnet.resultiterator.InputLayerResultIterator;
 import hu.akoel.n_neurnet.strategies.IResetWeightStrategy;
 import hu.akoel.n_neurnet.strategies.RandomResetWeightStrategy;
 
@@ -19,6 +19,7 @@ public class InputConnector implements IInputConnector{
 	public InputConnector( Layer inputLayer ){
 		this.inputLayer = inputLayer;
 		weights = new double[inputLayer.getSize()];
+		resetWeights();
 	}
 
 	public Layer getInputLayer() {		
@@ -29,8 +30,8 @@ public class InputConnector implements IInputConnector{
 		return weights;
 	}
 	
-	public IResultContainer getResultContainer() {
-		return new InputLayerResultContainer(this);
+	public IResultIterator getResultIterator() {
+		return new InputLayerResultIterator(this);
 	}
 	
 	public void setInputDataHandler( InputDataHandler inputDataHandler ){

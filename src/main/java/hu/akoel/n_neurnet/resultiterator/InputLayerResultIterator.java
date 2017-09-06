@@ -1,16 +1,16 @@
-package hu.akoel.n_neurnet.resultcontainers;
+package hu.akoel.n_neurnet.resultiterator;
 
 import hu.akoel.n_neurnet.connectors.InputConnector;
 import hu.akoel.n_neurnet.layer.Layer;
 import hu.akoel.n_neurnet.neuron.Neuron;
 
-public class InputLayerResultContainer implements IResultContainer{
+public class InputLayerResultIterator implements IResultIterator{
 	public int actualNeuron = -1;
 	public int actualWeight = -1;
 	public Layer inputLayer;
 	public double[] weights;
 	
-	public InputLayerResultContainer( InputConnector inputConnector ){
+	public InputLayerResultIterator( InputConnector inputConnector ){
 		this.inputLayer = inputConnector.getInputLayer();
 		weights = inputConnector.getWeights();
 	}
@@ -21,7 +21,7 @@ public class InputLayerResultContainer implements IResultContainer{
 	}
 
 	public boolean hasNextNeuron() {
-		if( actualNeuron + 1 < inputLayer.getSize() ){
+		if( actualNeuron +1 < inputLayer.getSize() ){
 			return true;
 		}
 		return false;
@@ -44,11 +44,11 @@ public class InputLayerResultContainer implements IResultContainer{
 	}
 
 	public int getNeuronIndex() {
-		return actualNeuron + 1;
+		return actualNeuron;
 	}
 
 	public int getWeightIndex() {
-		return actualWeight + 1;
+		return actualWeight;
 	}
 
 	public Layer getInputLayer() {

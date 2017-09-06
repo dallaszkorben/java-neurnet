@@ -4,8 +4,8 @@ import java.util.Iterator;
 
 import hu.akoel.n_neurnet.layer.Layer;
 import hu.akoel.n_neurnet.neuron.Neuron;
-import hu.akoel.n_neurnet.resultcontainers.IResultContainer;
-import hu.akoel.n_neurnet.resultcontainers.InnerLayerResultContainer;
+import hu.akoel.n_neurnet.resultiterator.IResultIterator;
+import hu.akoel.n_neurnet.resultiterator.InnerLayerResultIterator;
 import hu.akoel.n_neurnet.strategies.IResetWeightStrategy;
 import hu.akoel.n_neurnet.strategies.RandomResetWeightStrategy;
 
@@ -24,7 +24,6 @@ public class InnerConnector implements IInputConnector, IOutputConnector{
 		resetWeights();
 	}
 	
-	
 	//
 	// --- COMMON ---
 	//
@@ -40,8 +39,8 @@ public class InnerConnector implements IInputConnector, IOutputConnector{
 	//
 	//--- INPUT ---
 	//
-	public IResultContainer getResultContainer() {
-		return new InnerLayerResultContainer( this );
+	public IResultIterator getResultIterator() {
+		return new InnerLayerResultIterator( this );
 	}
 	
 	public Layer getInputLayer() {
@@ -104,10 +103,7 @@ public class InnerConnector implements IInputConnector, IOutputConnector{
 		for( int i = 0; i < inputLayer.getSize(); i++ ){
 			calculateInputWeight( i, α, β );
 		}		
-	}
-
-
-	
+	}	
 	
 	//
 	//--- OUTPUT ---

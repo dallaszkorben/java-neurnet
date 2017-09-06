@@ -10,8 +10,7 @@ import hu.akoel.n_neurnet.layer.Layer;
 import hu.akoel.n_neurnet.handlers.DataHandler;
 import hu.akoel.n_neurnet.listeners.ICycleListener;
 import hu.akoel.n_neurnet.neuron.Neuron;
-import hu.akoel.n_neurnet.resultcontainers.IResultContainer;
-import hu.akoel.n_neurnet.resultcontainers.InnerLayerResultContainer;
+import hu.akoel.n_neurnet.resultiterator.IResultIterator;
 import hu.akoel.n_neurnet.strategies.IResetWeightStrategy;
 import hu.akoel.n_neurnet.strategies.RandomResetWeightStrategy;
 
@@ -80,15 +79,15 @@ public class Network {
 		outputConnector.setOutputDataHandler( dataHandler );			
 	}
 	
-	public ArrayList<IResultContainer> getResultContainer(){		
+	public ArrayList<IResultIterator> getResultContainer(){		
 		
-		ArrayList<IResultContainer> outWeights = new ArrayList<IResultContainer>();
+		ArrayList<IResultIterator> outWeights = new ArrayList<IResultIterator>();
 	
-		outWeights.add( inputConnector.getResultContainer() );
+		outWeights.add( inputConnector.getResultIterator() );
 		Iterator<InnerConnector> innerConnectorIterator = innerConnectorList.iterator();
 		while( innerConnectorIterator.hasNext() ){
 			InnerConnector ic = innerConnectorIterator.next();
-			outWeights.add( ic.getResultContainer() );
+			outWeights.add( ic.getResultIterator() );
 		}
 		return outWeights;
 	}
@@ -102,7 +101,7 @@ public class Network {
 		//inputConnector = new InputConnector( dataHandler, layerList.get(0) );
 		inputConnector = new InputConnector( layerList.get(0) );
 		inputConnector.setResetWeightStrategy(resetWeightStrategy);
-		//inputConnector.resetWeights();
+		inputConnector.resetWeights();
 		
 		//outputConnector = new OutputConnector( layerList.get( layerList.size() - 1 ), dataHandler );
 		outputConnector = new OutputConnector( layerList.get( layerList.size() - 1 ) );
@@ -116,7 +115,7 @@ public class Network {
 			if( null != previousLayer ){
 				InnerConnector innerConnector = new InnerConnector( previousLayer, actualLayer );
 				innerConnector.setResetWeightStrategy(resetWeightStrategy);
-				//innerConnector.resetWeights();
+				innerConnector.resetWeights();
 				
 				innerConnectorList.add(innerConnector);
 			}
