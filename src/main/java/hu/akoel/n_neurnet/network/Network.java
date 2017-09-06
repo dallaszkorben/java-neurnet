@@ -79,7 +79,7 @@ public class Network {
 		outputConnector.setOutputDataHandler( dataHandler );			
 	}
 	
-	public ArrayList<IResultIterator> getResultContainer(){		
+	public ArrayList<IResultIterator> getResultIteratorArray(){		
 		
 		ArrayList<IResultIterator> outWeights = new ArrayList<IResultIterator>();
 	
@@ -145,7 +145,7 @@ public class Network {
 		setDataHandler( trainingDataHandler );
 		
 		//Run the training again and again until the error is less then a certain value
-		for( int i = 0; i <= maxTrainCycle; i++ ){
+		for( int i = 0; i < maxTrainCycle; i++ ){
 			
 			double squareError = 0;
 
@@ -190,7 +190,7 @@ public class Network {
 			squareError /= trainingDataHandler.getSize();
 			
 			if( null != trainingCycleListener )
-				trainingCycleListener.handlerError( i, squareError);
+				trainingCycleListener.handlerError( i, squareError, getResultIteratorArray());
 		
 			if( squareError <= maxTotalMeanSquareError ){				
 				break;
