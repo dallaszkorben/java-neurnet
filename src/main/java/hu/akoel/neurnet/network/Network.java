@@ -1,49 +1,35 @@
 package hu.akoel.neurnet.network;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
 
-import hu.akoel.neurnet.layer.ALayer;
-import hu.akoel.neurnet.layer.InnerLayer;
-import hu.akoel.neurnet.layer.InputLayer;
-import hu.akoel.neurnet.layer.OutputLayer;
+import hu.akoel.neurnet.connectors.InnerConnector;
+import hu.akoel.neurnet.connectors.InputConnector;
+import hu.akoel.neurnet.connectors.OutputConnector;
+import hu.akoel.neurnet.handlers.DataHandler;
+import hu.akoel.neurnet.layer.Layer;
+import hu.akoel.neurnet.listeners.IActivityListener;
 import hu.akoel.neurnet.listeners.ICycleListener;
-import hu.akoel.neurnet.neuron.InputNeuron;
-import hu.akoel.neurnet.strategies.DefaultWeightStrategy;
-import hu.akoel.neurnet.strategies.RandomDefaultWeightStrategy;
+import hu.akoel.neurnet.resultiterator.IResultIterator;
+import hu.akoel.neurnet.strategies.IResetWeightStrategy;
+import hu.akoel.neurnet.strategies.RandomResetWeightStrategy;
 
 public class Network {
-	public static final double defaultα = 0.2;
-	public static final double defaultβ = 0.3;
-	public static final int defaultMaxTrainCycle = 10000000;
-	
-	private double α = defaultα; //Tanulasi rata
-	private double β = defaultβ; //momentum	
-	private int maxTrainCycle = defaultMaxTrainCycle;
-	
-	private InputLayer inputLayer;
-	private OutputLayer outputLayer;
-	private DefaultWeightStrategy defaultWeightStrategy = new RandomDefaultWeightStrategy();
-	private ArrayList<InnerLayer> innerLayerList = new ArrayList<InnerLayer>();
 	private ICycleListener trainingCycleListener = null;
+	private ICycleListener testCycleListener = null;
+	private IActivityListener activityListener = null;
+	private IResetWeightStrategy resetWeightStrategy = new RandomResetWeightStrategy();
+	private ArrayList<Layer> layerList = new ArrayList<Layer>();	
+	private double α = 0.3;
+	private double β = 0.0;
+	private int maxTrainCycle = 1;
+	private boolean stopTraining = false;
 	
-	public Network( InputLayer inputLayer, OutputLayer outputLayer ){
-		this.inputLayer = inputLayer;
-		inputLayer.setOrderOfLayer( 0 );
-		this.outputLayer = outputLayer;
-		outputLayer.setOrderOfLayer( 1 );
-		makeConnections();
-	}
+	private InputConnector inputConnector;
+	private OutputConnector outputConnector;
+	private ArrayList<InnerConnector> innerConnectorList = new ArrayList<InnerConnector>();
 	
-	public void addInnerLayer( InnerLayer innerLayer ){
-		this.innerLayerList.add( innerLayer );
-		innerLayer.setOrderOfLayer( this.innerLayerList.size() );
-		this.outputLayer.setOrderOfLayer( this.outputLayer.getOrderOfLayer() + 1 );
-		makeConnections();
-	}
+	private boolean hasBeenInitialized = false;
 
 	public void setLearningRate( double α ){
 		this.α = α;
@@ -69,103 +55,215 @@ public class Network {
 		return this.maxTrainCycle;
 	}
 	
-	public void setTrainingCycleListener( ICycleListener trainingCycleListener ){
-		this.trainingCycleListener = trainingCycleListener;
+	public void addLayer( Layer layer ){
+		layerList.add( layer );
+		hasBeenInitialized = false;
+	}	
+
+	public void setTrainingCycleListener( ICycleListener cycleListener ){
+		this.trainingCycleListener = cycleListener;
+	}
+	
+	public void setTestCycleListener( ICycleListener cycleListener ){
+		this.testCycleListener = cycleListener;
+	}
+	
+	public void setActivityListener( IActivityListener activityListener ){
+		this.activityListener = activityListener;
+	}
+	
+	public void setResetWeightStrategy( IResetWeightStrategy resetWeightStrategy ){
+		this.resetWeightStrategy = resetWeightStrategy;
+	}
+	
+	private void resetWeights(){
+		inputConnector.resetWeights();
+		
+		Iterator<InnerConnector> innerConnectorIterator = innerConnectorList.iterator();
+		while( innerConnectorIterator.hasNext() ){
+			innerConnectorIterator.next().resetWeights();
+		}
+	}
+	
+	private void setDataHandler( DataHandler dataHandler ){
+		inputConnector.setInputDataHandler( dataHandler );
+		outputConnector.setOutputDataHandler( dataHandler );			
+	}
+	
+	public ArrayList<IResultIterator> getResultIteratorArray(){		
+		
+		ArrayList<IResultIterator> outWeights = new ArrayList<IResultIterator>();
+	
+		outWeights.add( inputConnector.getResultIterator() );
+		Iterator<InnerConnector> innerConnectorIterator = innerConnectorList.iterator();
+		while( innerConnectorIterator.hasNext() ){
+			InnerConnector ic = innerConnectorIterator.next();
+			outWeights.add( ic.getResultIterator() );
+		}
+		return outWeights;
+	}
+	
+	public void stopTraining(){
+		this.stopTraining = true;
 	}
 	
 	/**
-	 * set the weight for the Layers
+	 * Must be called when added or removed Layer
+	 * @param dataHandler
 	 */
-	private void makeConnections(){
-		ALayer<?,?> previousLayer = inputLayer;
+	private void initialize(){
+	
+		//inputConnector = new InputConnector( dataHandler, layerList.get(0) );
+		inputConnector = new InputConnector( layerList.get(0) );
+		inputConnector.setResetWeightStrategy(resetWeightStrategy);
+		inputConnector.resetWeights();
 		
-		inputLayer.initializeNeurons(defaultWeightStrategy);
-		for( InnerLayer layer: innerLayerList ){
-			layer.initializeNeurons(previousLayer, defaultWeightStrategy);
-			previousLayer = layer;
+		//outputConnector = new OutputConnector( layerList.get( layerList.size() - 1 ), dataHandler );
+		outputConnector = new OutputConnector( layerList.get( layerList.size() - 1 ) );
+		
+		innerConnectorList = new ArrayList<InnerConnector>();
+		
+		Iterator<Layer> layerIterator = layerList.iterator();
+		Layer previousLayer = null;
+		while( layerIterator.hasNext() ){
+			Layer actualLayer = layerIterator.next();
+			if( null != previousLayer ){
+				InnerConnector innerConnector = new InnerConnector( previousLayer, actualLayer );
+				innerConnector.setResetWeightStrategy(resetWeightStrategy);
+				innerConnector.resetWeights();
+				
+				innerConnectorList.add(innerConnector);
+			}
+			previousLayer = actualLayer;
+		}		
+		hasBeenInitialized = true;
+	}
+
+	public void executeTraining( DataHandler trainingDataHandler, double maxTotalMeanSquareError ){
+		executeTraining(true, trainingDataHandler, maxTotalMeanSquareError);
+	}
+	
+	public void executeTraining( boolean needResetWeights, DataHandler trainingDataHandler, double maxTotalMeanSquareError ){
+	
+		if( null != activityListener ){
+			activityListener.started();
 		}
-		outputLayer.initializeNeurons(previousLayer, defaultWeightStrategy);
-	}
-	
-	public void setStartingWeightStrategy( DefaultWeightStrategy startingWeightStrategy ){
-		this.defaultWeightStrategy = startingWeightStrategy;
-		makeConnections();
-	}
-	
-	public void training( ArrayList<double[]> trainingInputList, ArrayList<double[]> trainingOutputList, double maxTotalMeanSquareError ){
-		int numberOfTestData = Math.max( trainingInputList.size(), trainingOutputList.size() );
+
+		stopTraining = false;
+		
+		//Makes the necessary connections between Layers
+		if( !hasBeenInitialized ){
+			initialize();
+		}
+		
+		//Resets the Weights if needed
+		if( needResetWeights ){
+			resetWeights();
+		}
+
+		//Sets the necessary DataHandler
+		setDataHandler( trainingDataHandler );
 		
 		//Run the training again and again until the error is less then a certain value
-		for( int i = 0; i <= maxTrainCycle; i++ ){
+		for( int i = 0; i < maxTrainCycle; i++ ){
 			
 			double squareError = 0;
-			
-			//In One period we train the all training data
-			for( int j = 0; j < numberOfTestData; j++ ){
-				
-				double[] trainingInputArray = trainingInputList.get(j);
-				double[] trainingOutputArray = trainingOutputList.get(j);
-				
-				//Load Inputs for Sigma calculation
-				Iterator<InputNeuron> iterator = inputLayer.getNeuronIterator();
-				int inputOrder = 0;
-				while( iterator.hasNext() ){
-					InputNeuron neuron = (InputNeuron)iterator.next();
-					neuron.setInput( trainingInputArray[inputOrder]);					
-					inputOrder++;
-				}
-				
-				// --- 1. step ---
-				// Sigma calculation by the NEW Input and the OLD Weight
-				inputLayer.calculateSigmas();
-				for( InnerLayer layer: innerLayerList ){
-					layer.calculateSigmas();
-				}
-				outputLayer.calculateSigmas();
 
-				// --- 2. step ---
-				// Weight calculation by the new Sigma
-				// In case of calculation of Weights it is needed: 
-				// -OutputLayer: expected Output
-				// -InputLayer:  previous Layer
-				outputLayer.calculateWeights(trainingOutputArray, α, β );
-				ALayer<?,?> nextLayer = outputLayer;				
+			//Starts Training data from begining
+			trainingDataHandler.reset();
+			while( trainingDataHandler.hasNext() ){
 
-				ListIterator<InnerLayer> innerLayerBackIterator = innerLayerList.listIterator(innerLayerList.size()); 
-				while( innerLayerBackIterator.hasPrevious() ){
-					InnerLayer layer = innerLayerBackIterator.previous();
-					layer.calculateWeights(nextLayer, α, β);
-					nextLayer = layer;
+				//Takes the next Training data
+				trainingDataHandler.takeNext();		
+		
+				//--- 1. step ---
+				//--- Calculate Sigma
+				inputConnector.calculateInputSigmas();
+				for( InnerConnector innerConnector: innerConnectorList ){
+					innerConnector.calculateInputSigmas();
 				}
-				//List<InnerLayer> shallowCopy = innerLayerList.subList(0, innerLayerList.size());
-				//Collections.reverse(shallowCopy);
-				//for( InnerLayer layer: shallowCopy ){
-				//	layer.calculateWeights(nextLayer, α, β);
-				//	nextLayer = layer;
-				//}
-				inputLayer.calculateWeights(nextLayer, α, β);
-				
-				// --- 3. step ---
-				// Sigma calculation  by the NEW Input and the NEW Weight
-				inputLayer.calculateSigmas();
-				for( InnerLayer layer: innerLayerList ){
-					layer.calculateSigmas();
+
+				//--- Step 2. ---
+				//--- Mean Square Error calculation
+
+				//--- Step 3. ---
+				//--- Calculate Delta ---
+				outputConnector.calculateOutputDeltas();
+				for( int j = innerConnectorList.size() - 1; j >= 0; j--){			
+					//for( InnerConnector innerConnector: innerConnectorList ){
+					InnerConnector innerConnector = innerConnectorList.get( j );
+					innerConnector.calculateOutputDeltas();
 				}
-				outputLayer.calculateSigmas();
+		
+				//--- Step 4. ---
+				//--- Calculate Weight ---
+				inputConnector.calculateInputWeights(α, β);
+				for( InnerConnector innerConnector: innerConnectorList ){
+					innerConnector.calculateInputWeights(α, β);
+				}
 				
 				//Error Calculation
-				squareError += outputLayer.getMeanSquareError(trainingOutputArray);
+				squareError += outputConnector.getMeanSquareError();
+
 			}
-		
-			squareError /= numberOfTestData;
+			
+			squareError /= trainingDataHandler.getSize();
 			
 			if( null != trainingCycleListener )
-				trainingCycleListener.handlerError( i, squareError);
+				trainingCycleListener.handlerError( i, squareError, getResultIteratorArray());
 		
 			if( squareError <= maxTotalMeanSquareError ){				
 				break;
 			}
+			
+			if( stopTraining ){
+				break;
+			}
 		}
 		
+		if( null != activityListener ){
+			activityListener.stopped();
+		}
+	}
+	
+	public void executeTest( DataHandler testDataHandler ){
+		
+		//It returns if there was no Initialization
+		if( !hasBeenInitialized ){
+			return;
+		}
+		
+		//Sets the necessary DataHandler
+		setDataHandler( testDataHandler );
+		
+		//Resets the test data
+		testDataHandler.reset();
+		
+		int i = 0;
+		while( testDataHandler.hasNext() ){
+
+			//Takes the next Training data
+			testDataHandler.takeNext();		
+		
+			//--- Calculate Sigma
+			inputConnector.calculateInputSigmas();
+			for( InnerConnector innerConnector: innerConnectorList ){
+				innerConnector.calculateInputSigmas();
+			}
+
+			if( null != testCycleListener ){
+				testCycleListener.handlerError( i, outputConnector.getMeanSquareError(), getResultIteratorArray());
+			}
+			
+			i++;
+						
+			/*Iterator<Neuron> neuronIterator = outputConnector.getOutputLayer().getNeuronIterator();
+			while( neuronIterator.hasNext() ){
+				Neuron actualNeuron = neuronIterator.next();
+		
+				System.out.println("input: " + testDataHandler.getInput( actualNeuron.getIndex() ) + " expected value: " + testDataHandler.getExpectedOutput( actualNeuron.getIndex()) + " actual value: " + actualNeuron.getSigma() );
+				
+			}*/
+		}
 	}
 }

@@ -1,6 +1,9 @@
 package hu.akoel.neurnet.listeners;
 
-public interface ICycleListener {
+import java.util.ArrayList;
 
-	public void handlerError( int cycleCounter, double totalMeanSquareError );
+import hu.akoel.neurnet.resultiterator.IResultIterator;
+
+public interface ICycleListener {
+	public void handlerError( int cycleCounter, double totalMeanSquareError, ArrayList<IResultIterator> resultIteratorArray );
 }

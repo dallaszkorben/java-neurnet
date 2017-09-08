@@ -3,25 +3,21 @@ package hu.akoel.neurnet;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import hu.akoel.neurnet.layer.InnerLayer;
-import hu.akoel.neurnet.layer.InputLayer;
-import hu.akoel.neurnet.layer.OutputLayer;
+import hu.akoel.neurnet.activationfunctions.IActivationFunction;
+import hu.akoel.neurnet.handlers.DataHandler;
+import hu.akoel.neurnet.layer.Layer;
 import hu.akoel.neurnet.listeners.ICycleListener;
 import hu.akoel.neurnet.network.Network;
-import hu.akoel.neurnet.neuron.ANeuron;
-import hu.akoel.neurnet.neuron.InnerNeuron;
-import hu.akoel.neurnet.neuron.InputNeuron;
-import hu.akoel.neurnet.neuron.NeuronWeights;
-import hu.akoel.neurnet.neuron.OutputNeuron;
-import hu.akoel.neurnet.strategies.DefaultWeightStrategy;
+import hu.akoel.neurnet.neuron.Neuron;
+import hu.akoel.neurnet.resultiterator.IResultIterator;
+import hu.akoel.neurnet.strategies.IResetWeightStrategy;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
 	
 public class NetworkTest extends TestCase{ 
 
-	public static int actualCycle;
+	public static int staticCycle;
 	
 	public NetworkTest( String testName ) {
 		super( testName );
@@ -31,240 +27,350 @@ public class NetworkTest extends TestCase{
 		return new TestSuite( NetworkTest.class );
 	}
 	
-	public void test_Check_GettersSetters(){
-		final double[][] dataPairs = {
-    			//α,  β}
-    			{0.0, 0.0, 1.0},
-    			{0.0, 1.0, 2.0},
-    			{1.0, 0.0, 3.0},
-    			{1.0, 1.0, 4.0},
-    			{0.234, 0.00156, 5.0},
-    			{0.00156, 0.234, 6.0},
-    	};		
-				
-    	//Input Layer
-    	InputLayer inputLayer = new InputLayer();    			
-   		InputNeuron inputNeuron = new InputNeuron();
-   		inputLayer.addNeuron(inputNeuron);
-		
-    	//
-    	//Output Layer
-    	OutputLayer outputLayer = new OutputLayer();
-   		OutputNeuron outputNeuron = new OutputNeuron();
-   		outputLayer.addNeuron(outputNeuron);
-   		
-    	//These section what I test (connections are OK or not)
-    	Network network = new Network(inputLayer, outputLayer);
-    	
-    	for( int i = 0; i < dataPairs.length; i++ ){
-    		network.setLearningRate(dataPairs[i][0]);
-    		assertEquals(dataPairs[i][0], network.getLearningRate());
-
-    		network.setMomentum(dataPairs[i][1]);
-    		assertEquals(dataPairs[i][1], network.getMomentum());
-    		
-    		network.setMaxTrainCycle((int)dataPairs[i][2]);
-    		assertEquals((int)dataPairs[i][2], network.getMaxTrainCycle());
-    	}
-    	
-	}	    
+	class MyActivationFunction_ActivationFunction implements IActivationFunction {
+		private double summa;
+		MyActivationFunction_ActivationFunction( double summa ) {
+			this.summa = summa;
+		}
+		public double getSigma() {
+			return summa;
+		}			
+		public double getDerivateSigmaBySum() {
+			return 0;
+		}
+		public void calculateDetails(double summa) {
+		}
+	};
 	
-	public void test_Check_Connections(){
-    	int numberOfNeurons = 100;
+	class MyDataHandler extends DataHandler{
+		double[][] input;
+		double[][] output;
+		int pointer = -1;
 
-    	//DefaultWeightStrategy
-    	DefaultWeightStrategy dws = new DefaultWeightStrategy() {
-			public Double getValue(ANeuron previousNeuron, ANeuron actualNeuron) {
-				return ( actualNeuron.getOrder() + 0.0 );
+		public MyDataHandler(double[][] input, double[][] output){
+			this.input = input;
+			this.output = output;
+		}
+		
+		public double getInput(int inputNeuronIndex) {
+			return input[pointer][inputNeuronIndex];
+		}
+
+		public double getExpectedOutput(int outputNeuronIndex) {
+			return output[pointer][outputNeuronIndex];
+		}
+
+		@Override
+		public boolean hasNext() {
+			if( pointer + 1 < input.length )
+				return true;
+			else
+				return false;
+		}
+
+		@Override
+		public void reset() {
+			pointer = -1;
+		}
+
+		@Override
+		public void takeNext() {
+			pointer++;
+		}
+
+		@Override
+		public double getSize() {			
+			return input.length;
+		}		
+	}
+	
+	private Network getGenaralNeuron( final double[][][][] dataPairs ){
+		int inputLayerSize = 1;
+		int innerLayerSize = 2;
+		int outputLayerSize = 1;
+		
+		final Layer inputLayer = new Layer();
+		for( int i = 0; i < inputLayerSize; i++ ){
+			Neuron neuron = new Neuron();
+			
+			//set Delta for input neurons
+			//neuron.setDelta( dataPairs[ staticCycle][1][i] );
+			inputLayer.addNeuron(neuron);
+		}
+
+		Layer innerLayer = new Layer();
+		for( int i = 0; i < innerLayerSize; i++ ){
+			Neuron neuron = new Neuron();
+			innerLayer.addNeuron(neuron);
+		}
+
+		Layer outputLayer = new Layer();
+		for( int i = 0; i < outputLayerSize; i++ ){
+			Neuron neuron = new Neuron();
+			outputLayer.addNeuron(neuron);
+		}		
+		
+		Network myNetwork = new Network();
+		myNetwork.addLayer(inputLayer);
+		myNetwork.addLayer(innerLayer);
+		myNetwork.addLayer(outputLayer);
+		
+		//Set initial Weights
+		myNetwork.setResetWeightStrategy( new IResetWeightStrategy() {
+			public double getWeight(Neuron outputNeuron, Neuron inputNeuron) {
+				
+				//1 layer
+				if( null == outputNeuron ){
+					return dataPairs[staticCycle][2][0][0];
+
+				//1-2 layer
+				}else if( inputLayer.getNeuronIndex(outputNeuron) >= 0 ){
+					return dataPairs[staticCycle][2][1][inputNeuron.getIndex()];
+					
+				//2-3 layer
+				}else{
+					return dataPairs[staticCycle][2][2][outputNeuron.getIndex()];
+				}					
 			}
+		});
+		
+		return myNetwork;
+	}
+	
+	public void test_SettersGetters(){	
+		final double[][][][] dataPairs = {
+				//{I},      {O},    	 {w01 w10 w11 w20},       {cycle, α, β}
+				{
+					{{0.1}, {0.15}, {0.2}, {0.3}, {0.35}, {0.4}, {0.45}, {0.5}}, 
+					{{0.1}, {0.15}, {0.2}, {0.3}, {0.35}, {0.4}, {0.45}, {0.5}},  
+					{{1.0}, {2.0, 3.0}, {4.0, 5.0}}, 
+					{{1000.0, 0.0, 0.0}, {253.0, 0.99, 0.0}, {253.0, 0.0, 0.99}, {253.0, 0.45, 0.32}} 
+				},					
 		};
 
-    	
-		//
-    	//Input Layer
-    	InputLayer inputLayer = new InputLayer();    			
-    	for( int i = 0; i < numberOfNeurons; i++ ){
-    		InputNeuron inputNeuron = new InputNeuron();
-    		inputLayer.addNeuron(inputNeuron);
-    	}
-		
-    	//
-    	//Inner Layer
-    	InnerLayer innerLayer = new InnerLayer();    			
-    	for( int i = 0; i < numberOfNeurons; i++ ){
-    		InnerNeuron innerNeuron = new InnerNeuron();
-    		innerLayer.addNeuron(innerNeuron);
-    	}    	
-    	
-    	//
-    	//Output Layer
-    	OutputLayer outputLayer = new OutputLayer();
-    	for( int i = 0; i < numberOfNeurons; i++ ){
-    		OutputNeuron outputNeuron = new OutputNeuron();
-    		outputLayer.addNeuron(outputNeuron);
-    		//outputNeuron.setSigma( (i) );
-    	}
+		for( staticCycle = 0; staticCycle < dataPairs.length; staticCycle++ ){
 
-    	//These section what I test (connections are OK or not)
-    	Network network = new Network(inputLayer, outputLayer);
-    	network.setStartingWeightStrategy( dws );
-    	network.addInnerLayer(innerLayer);
-    	
-    	//Check the order of the layers
-    	assertEquals( 0, (int)inputLayer.getOrderOfLayer() );
-    	assertEquals( 1, (int)innerLayer.getOrderOfLayer() );
-    	assertEquals( 2, (int)outputLayer.getOrderOfLayer() );
-    	
-    	//Check the connections (start weights
-    	//inputLayer
-    	Iterator<InputNeuron> inputIt = inputLayer.getNeuronIterator();
-    	while( inputIt.hasNext() ){
-    		InputNeuron actualNeuron = inputIt.next();
-    		assertEquals( actualNeuron.getOrder() + 0.0, actualNeuron.getWeight() );
-    	}
-    	
-    	//InnerLayer
-    	Iterator<InnerNeuron> innerIt = innerLayer.getNeuronIterator();
-    	while( innerIt.hasNext() ){
-    		InnerNeuron actualNeuron = innerIt.next();    		
-    		for( int i = 0; i < inputLayer.getNumberOfNeurons(); i++ ){
-    			NeuronWeights neuronWeights = actualNeuron.getNeuronValues(i);
-    			assertEquals(  actualNeuron.getOrder() + 0.0, neuronWeights.getW_t() );
-    			assertEquals( inputLayer.getNeuronList().get(i), neuronWeights.getPreviousNeuron() );
-    		}
-    	}
-    	
-    	//OutputLayer
-    	Iterator<OutputNeuron> outputIt = outputLayer.getNeuronIterator();
-    	while( outputIt.hasNext() ){
-    		OutputNeuron actualNeuron = outputIt.next();    		
-    		for( int i = 0; i < innerLayer.getNumberOfNeurons(); i++ ){
-    			NeuronWeights neuronWeights = actualNeuron.getNeuronValues(i);
-    			assertEquals(  actualNeuron.getOrder() + 0.0, neuronWeights.getW_t() );
-    			assertEquals( innerLayer.getNeuronList().get(i), neuronWeights.getPreviousNeuron() );
-    		}
-    	}    	
-    }    
-	
-	public void test_Training_Method(){
-/*	   	double[][] trainingData = {
-    			{0.0, 0.0},
-    			{0.1, 1.0},
-    			{0.2, 2.0},    			
-    			{0.3, 3.0},
-    			{0.4, 4.0},
-    			{0.5, 5.0},
-    			{0.6, 6.0},    			
-    			{0.7, 7.0},
-    			{0.8, 8.0},    			
-    			{0.9, 9.0},    			
-    			{1.0, 10.0},    			
-    	};
-*/	   	double[][] trainingData = {
-    			{0.1, 0.4},
-    			{0.1, 0.4},
-    			{0.15, 0.35},
-    			{0.2, 0.3},  
-    			//{0.25, 0.25},
-    			{0.3, 0.2},
-    			{0.35, 0.15},
-    			{0.4, 0.1},
-    			{0.45, 0.05},
-    			{0.5, 0.0},    			 			
-    	};
-
-		int numberOfNeuronsInput = 2;
-    	int numberOfNeuronsInner = 3;
-    	int numberOfNeuronsOutput = 1;
-
-		//
-    	//Input Layer
-    	InputLayer inputLayer = new InputLayer();    			
-    	for( int i = 0; i < numberOfNeuronsInput; i++ ){
-    		InputNeuron inputNeuron = new InputNeuron();
-    		inputLayer.addNeuron(inputNeuron);
-    	}
-		
-    	//
-    	//Inner Layer
-    	InnerLayer innerLayer1 = new InnerLayer();    			
-    	for( int i = 0; i < numberOfNeuronsInner; i++ ){
-    		InnerNeuron innerNeuron = new InnerNeuron();
-    		innerLayer1.addNeuron(innerNeuron);
-    	}    	
-
-    	//
-    	//Output Layer
-    	OutputLayer outputLayer = new OutputLayer();
-    	for( int i = 0; i < numberOfNeuronsOutput; i++ ){
-    		OutputNeuron outputNeuron = new OutputNeuron();
-    		outputLayer.addNeuron(outputNeuron);
-    	}
-
-    	//These section what I test (connections are OK or not)
-    	Network network = new Network(inputLayer, outputLayer);
-    	network.addInnerLayer(innerLayer1);
-    	network.setLearningRate( 0.3 );
-		network.setMomentum( 0.5 );
-    	
-    	network.setStartingWeightStrategy( new DefaultWeightStrategy() {
-			public Double getValue(ANeuron previousNeuron, ANeuron actualNeuron) {
-				return ( actualNeuron.getOrder() + 0.0 );
+			Network myNetwork = getGenaralNeuron(dataPairs);
+			
+			for( int i = 0; i < dataPairs[staticCycle][3].length; i++){
+				myNetwork.setMaxTrainCycle((int)dataPairs[staticCycle][3][i][0]);
+				myNetwork.setLearningRate(dataPairs[staticCycle][3][i][1]);
+				myNetwork.setMomentum(dataPairs[staticCycle][3][i][2]);
+				
+				assertEquals( (int)dataPairs[staticCycle][3][i][0], myNetwork.getMaxTrainCycle() );
+				assertEquals( dataPairs[staticCycle][3][i][1], myNetwork.getLearningRate() );
+				assertEquals( dataPairs[staticCycle][3][i][2], myNetwork.getMomentum() );
 			}
-		} );
-    	network.setTrainingCycleListener( new ICycleListener() {			
-			public void handlerError(int cycleCounter, double totalMeanSquareError) {
-				//if( cycleCounter % 10000 == 0 ){
-					//System.err.println( "i: " + cycleCounter + "   Err: " + totalMeanSquareError);
-				//}
-				NetworkTest.actualCycle = cycleCounter;
-			}
-		});	    	
-    	
-    	double[] trainingInput = new double[2];
-    	double[] trainingOutput = new double[1];
-    	ArrayList<double[]> trainingInputList = new ArrayList<double[]>();
-    	ArrayList<double[]> trainingOutputList = new ArrayList<double[]>();
-    	for( int i = 0; i < trainingData.length; i++ ){
-    		trainingInput = new double[]{ trainingData[i][0], 1.0 };
-    		trainingOutput = new double[]{ trainingData[i][1] };
-        	trainingInputList.add(trainingInput);
-        	trainingOutputList.add(trainingOutput);
-    	}
-    	
-
-    	double maxTotalMeanSquereError = 0.0004;
-    	int trainingCycle = 1;
-    	//
-    	// Test if the trainingCycle < maxTotalMeanSquareError
-    	//
-    	trainingCycle = 1;
-    	network.setMaxTrainCycle( trainingCycle );
-    	network.training(trainingInputList, trainingOutputList, maxTotalMeanSquereError);
-    	assertEquals(trainingCycle, NetworkTest.actualCycle);
-    	
-    	//
-    	// Test if the trainingCycle > maxTotalMeanSquareError
-    	//
-    	trainingCycle = 10000000;
-    	int expectedCycle = 49365;
-    	network.setMaxTrainCycle( trainingCycle );
-    	network.training(trainingInputList, trainingOutputList, maxTotalMeanSquereError);
-    	assertEquals(expectedCycle, NetworkTest.actualCycle);
-    	
-    	//
-    	// Test if the output is OK for an test data
-    	//
-    	double testInput = 0.25;
-    	double expectedOutput = 0.23211085166858758;
-    	
-    	inputLayer.getNeuronList().get(0).setInput(testInput);
-		inputLayer.getNeuronList().get(1).setInput(1.0);
-    	inputLayer.calculateSigmas();
-    	innerLayer1.calculateSigmas();
-		outputLayer.calculateSigmas();
-    	assertEquals( expectedOutput, outputLayer.getNeuronList().get(0).getStoredSigma());
-    	
+		}		
 	}
+	
+	public void test_executeTraining_Method(){	
 		
+		final double[][][][] inputDataPairs = {
+				//{δi1, δi2, δi3}, {α, β}, {w1, w2, w3, w4, w5, w6, w7, w8, w9}, {σ1, σ2, σ3}
+				//{I},      {O},    	 {w01 w10 w11 w20},       {cycle, α, β}
+				{
+					{{0.1}, {0.15}, {0.2}, {0.3}, {0.35}, {0.4}, {0.45}, {0.5}}, 
+					{{0.1}, {0.15}, {0.2}, {0.3}, {0.35}, {0.4}, {0.45}, {0.5}},  
+					{{1.0}, {2.0, 3.0}, {4.0, 5.0}}, 
+					{{1001.0, 0.3, 0.0}}
+				},					
+		};
+		final double[][][][] outputDataPairs = {
+				//{expected w-s}
+				{
+					{{0.09955158924812021}}, {{0.6007897283660051}, {1.4952123897080412}}, {{-0.744372079095825,-0.547696937447136}},
+										
+				},					
+		};		
+		
+		for( staticCycle = 0; staticCycle < inputDataPairs.length; staticCycle++ ){
+
+			Network myNetwork = getGenaralNeuron(inputDataPairs);
+
+			MyDataHandler myTrainingDataListener = new MyDataHandler(inputDataPairs[staticCycle][0], inputDataPairs[staticCycle][1]);
+			
+			myNetwork.setMaxTrainCycle( (int)inputDataPairs[staticCycle][3][0][0] );
+			myNetwork.setLearningRate(inputDataPairs[staticCycle][3][0][1]);
+			myNetwork.setMomentum(inputDataPairs[staticCycle][3][0][2]);
+			
+			//--- that is under TEST ---
+			myNetwork.executeTraining(true, myTrainingDataListener, 0.00005);
+			
+			int layerIndex = 0;
+			ArrayList<IResultIterator> resultContainer = myNetwork.getResultIteratorArray();
+			Iterator<IResultIterator> resultContainerIterator = resultContainer.iterator();
+			while( resultContainerIterator.hasNext() ){				
+				IResultIterator resultIterator = resultContainerIterator.next();
+				
+				//System.err.println( "layer: " + resultIterator.getInputLayer() );				
+				
+				resultIterator.reset();
+				while( resultIterator.hasNextNeuron() ){
+					
+					resultIterator.getNextNeuron();
+					//System.err.println("  Neuron: " + " idx: " + neruron.getIndex() );
+					
+					while( resultIterator.hasNextWeight() ){
+
+						double weight = resultIterator.getNextWeight();
+						assertEquals(outputDataPairs[staticCycle][layerIndex][resultIterator.getNeuronIndex()][resultIterator.getWeightIndex()], weight);
+						//System.err.println("    w: " + resultIterator.getNextWeight() );
+						
+					}					
+				}
+				layerIndex++;
+			}			
+		}
+	}
+	
+	
+	public void test_TrainingCycleListener_Functionality(){	
+		
+		final double[][][][] inputDataPairs = {
+				//{I},      {O},    	 {w01 w10 w11 w20},       {cycle}
+				{
+					{{0.1}, {0.15}, {0.2}, {0.3}, {0.35}, {0.4}, {0.45}, {0.5}}, 
+					{{0.1}, {0.15}, {0.2}, {0.3}, {0.35}, {0.4}, {0.45}, {0.5}},  
+					{{1.0}, {2.0, 3.0}, {4.0, 5.0}}, 
+					{{3.0}}
+				},					
+		};
+		final double[][][][] outputDataPairs = {
+				//{cycle, total meansquare}, {w20, w21}, {σ20}
+				{
+					{{0.0, 0.49870521626940145}, {}, {0.9994098801906562}}, //cycle 0
+					{{1.0, 0.4987033180916924}, {}, {0.999408689304742}}, //cycle 1
+					{{2.0, 0.498701412807827}, {}, {0.9994074938566105}}, //cycle 2
+
+				},					
+		};		
+
+		for( staticCycle = 0; staticCycle < inputDataPairs.length; staticCycle++ ){
+
+			Network myNetwork = getGenaralNeuron(inputDataPairs);
+
+			MyDataHandler myTrainingDataListener = new MyDataHandler(inputDataPairs[staticCycle][0], inputDataPairs[staticCycle][1]);
+			
+			myNetwork.setMaxTrainCycle( (int)inputDataPairs[staticCycle][3][0][0] );
+
+			//--- that is under TEST ---
+			myNetwork.setTrainingCycleListener(new ICycleListener() {
+				int cycle = 0;
+				public void handlerError(int cycleCounter, double totalMeanSquareError,	ArrayList<IResultIterator> resultIteratorArray) {
+					assertEquals((int)outputDataPairs[staticCycle][cycle][0][0], cycleCounter);
+					assertEquals(outputDataPairs[staticCycle][cycle][0][1], totalMeanSquareError);
+					
+					IResultIterator resultIterator = resultIteratorArray.get(2);
+					while( resultIterator.hasNextNeuron() ){
+						Neuron neuron = resultIterator.getNextNeuron();
+						assertEquals(outputDataPairs[staticCycle][cycle][2][neuron.getIndex()], neuron.getSigma());
+					}
+					cycle++;
+				}
+			});
+			
+			myNetwork.executeTraining(true, myTrainingDataListener, 0.00005);
+		}
+	}	
+	
+
+	public void test_TestCycleListener_Functionality(){	
+		final double[][][][] trainingDataPairs = {
+				//{I},      {O},    	 {w01 w10 w11 w20},       {cycle}
+				{
+					{{0.1}, {0.15}, {0.2}, {0.3}, {0.35}, {0.4}, {0.45}, {0.5}}, 
+					{{0.1}, {0.15}, {0.2}, {0.3}, {0.35}, {0.4}, {0.45}, {0.5}},  
+					{{1.0}, {2.0, 3.0}, {4.0, 5.0}}, 
+					{{10000.0}}
+				},					
+		};
+		final double[][][][] testDataPairs = {
+				//{I},      {O}
+				{
+					{ {0.17},                {0.28},              {0.37} },
+					{ {0.16222119257521309}, {0.281363352170719}, {0.38054118264619985} }
+				}
+		};		
+
+		for( staticCycle = 0; staticCycle < trainingDataPairs.length; staticCycle++ ){
+
+			Network myNetwork = getGenaralNeuron(trainingDataPairs);
+
+			MyDataHandler myTrainingDataListener = new MyDataHandler(trainingDataPairs[staticCycle][0], trainingDataPairs[staticCycle][1]);
+			
+			myNetwork.setMaxTrainCycle( (int)trainingDataPairs[staticCycle][3][0][0] );
+
+			myNetwork.executeTraining(true, myTrainingDataListener, 0.00005);
+			
+			//--- that is under TEST ---
+			myNetwork.setTestCycleListener(new ICycleListener() {
+				int cycle = 0;
+				public void handlerError(int cycleCounter, double totalMeanSquareError,	ArrayList<IResultIterator> resultIteratorArray) {
+					
+					//Last layer ResultIterator
+					IResultIterator resultIterator = resultIteratorArray.get( resultIteratorArray.size() - 1 );
+					resultIterator.reset();
+					while( resultIterator.hasNextNeuron() ){
+						Neuron neuron = resultIterator.getNextNeuron();
+						
+						//System.err.println("actual out: " + neuron.getSigma() + " expected: " + testDataPairs[staticCycle][1][cycle][neuron.getIndex()] );
+						assertEquals(testDataPairs[staticCycle][1][cycle][neuron.getIndex()], neuron.getSigma());
+					}
+					cycle++;
+				}
+			});
+			
+			for( int i = 0; i < testDataPairs.length; i++){
+				MyDataHandler myTestDataListener = new MyDataHandler(testDataPairs[staticCycle][0], testDataPairs[staticCycle][1]);
+				myNetwork.executeTest(myTestDataListener);
+			}			
+		}
+	} 
+ 	
+	
+	
+	public void blabla(){	
+		
+		final double[][][][] inputDataPairs = {
+				//{δi1, δi2, δi3}, {α, β}, {w1, w2, w3, w4, w5, w6, w7, w8, w9}, {σ1, σ2, σ3}
+				//{I},      {O},    	 {w01 w10 w11 w20},       {cycle, α, β}
+				{
+					{{0.1}, {0.15}, {0.2}, {0.3}, {0.35}, {0.4}, {0.45}, {0.5}}, 
+					{{0.1}, {0.15}, {0.2}, {0.3}, {0.35}, {0.4}, {0.45}, {0.5}},  
+					{{1.0}, {2.0, 3.0}, {4.0, 5.0}}, 
+					{{10000000.0, 0.3, 0.1}}
+				},					
+		};	
+		
+		for( staticCycle = 0; staticCycle < inputDataPairs.length; staticCycle++ ){
+
+			Network myNetwork = getGenaralNeuron(inputDataPairs);
+
+			MyDataHandler myTrainingDataListener = new MyDataHandler(inputDataPairs[staticCycle][0], inputDataPairs[staticCycle][1]);
+			
+			myNetwork.setMaxTrainCycle( (int)inputDataPairs[staticCycle][3][0][0] );
+			myNetwork.setLearningRate(inputDataPairs[staticCycle][3][0][1]);
+			myNetwork.setMomentum(inputDataPairs[staticCycle][3][0][2]);
+			
+
+			myNetwork.setTrainingCycleListener(new ICycleListener() {
+				public void handlerError(int cycleCounter, double totalMeanSquareError,	ArrayList<IResultIterator> resultIteratorArray) {
+
+					if( cycleCounter % 1000 == 0)
+						System.err.println( cycleCounter + ": " + totalMeanSquareError);
+				}
+			});			
+			
+			System.err.println("Hello");
+			myNetwork.executeTraining(true, myTrainingDataListener, 0.00004);
+
+			
+		}
+	}
+	
+	
+	
+
+	
 }
