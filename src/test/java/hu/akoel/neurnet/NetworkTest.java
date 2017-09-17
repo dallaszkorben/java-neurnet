@@ -153,7 +153,7 @@ public class NetworkTest extends TestCase{
 			Network myNetwork = getGenaralNeuron(dataPairs);
 			
 			for( int i = 0; i < dataPairs[staticCycle][3].length; i++){
-				myNetwork.setMaxTrainCycle((int)dataPairs[staticCycle][3][i][0]);
+				myNetwork.setMaxTrainingLoop((int)dataPairs[staticCycle][3][i][0]);
 				myNetwork.setLearningRate(dataPairs[staticCycle][3][i][1]);
 				myNetwork.setMomentum(dataPairs[staticCycle][3][i][2]);
 				
@@ -190,12 +190,13 @@ public class NetworkTest extends TestCase{
 
 			MyDataHandler myTrainingDataListener = new MyDataHandler(inputDataPairs[staticCycle][0], inputDataPairs[staticCycle][1]);
 			
-			myNetwork.setMaxTrainCycle( (int)inputDataPairs[staticCycle][3][0][0] );
+			myNetwork.setMaxTrainingLoop( (int)inputDataPairs[staticCycle][3][0][0] );
 			myNetwork.setLearningRate(inputDataPairs[staticCycle][3][0][1]);
 			myNetwork.setMomentum(inputDataPairs[staticCycle][3][0][2]);
+			myNetwork.setMaxTotalMeanSquareError( 0.00005 );
 			
 			//--- that is under TEST ---
-			myNetwork.executeTraining(true, myTrainingDataListener, 0.00005);
+			myNetwork.executeTraining(true, myTrainingDataListener);
 			
 			int layerIndex = 0;
 			ArrayList<IResultIterator> resultContainer = myNetwork.getResultIteratorArray();
@@ -252,8 +253,9 @@ public class NetworkTest extends TestCase{
 
 			MyDataHandler myTrainingDataListener = new MyDataHandler(inputDataPairs[staticCycle][0], inputDataPairs[staticCycle][1]);
 			
-			myNetwork.setMaxTrainCycle( (int)inputDataPairs[staticCycle][3][0][0] );
-
+			myNetwork.setMaxTrainingLoop( (int)inputDataPairs[staticCycle][3][0][0] );
+			myNetwork.setMaxTotalMeanSquareError(0.00005);
+			
 			//--- that is under TEST ---
 			myNetwork.setTrainingCycleListener(new ICycleListener() {
 				int cycle = 0;
@@ -270,7 +272,7 @@ public class NetworkTest extends TestCase{
 				}
 			});
 			
-			myNetwork.executeTraining(true, myTrainingDataListener, 0.00005);
+			myNetwork.executeTraining(true, myTrainingDataListener);
 		}
 	}	
 	
@@ -299,9 +301,10 @@ public class NetworkTest extends TestCase{
 
 			MyDataHandler myTrainingDataListener = new MyDataHandler(trainingDataPairs[staticCycle][0], trainingDataPairs[staticCycle][1]);
 			
-			myNetwork.setMaxTrainCycle( (int)trainingDataPairs[staticCycle][3][0][0] );
+			myNetwork.setMaxTrainingLoop( (int)trainingDataPairs[staticCycle][3][0][0] );
+			myNetwork.setMaxTotalMeanSquareError(0.00005);
 
-			myNetwork.executeTraining(true, myTrainingDataListener, 0.00005);
+			myNetwork.executeTraining(true, myTrainingDataListener);
 			
 			//--- that is under TEST ---
 			myNetwork.setTestCycleListener(new ICycleListener() {
@@ -349,10 +352,10 @@ public class NetworkTest extends TestCase{
 
 			MyDataHandler myTrainingDataListener = new MyDataHandler(inputDataPairs[staticCycle][0], inputDataPairs[staticCycle][1]);
 			
-			myNetwork.setMaxTrainCycle( (int)inputDataPairs[staticCycle][3][0][0] );
+			myNetwork.setMaxTrainingLoop( (int)inputDataPairs[staticCycle][3][0][0] );
 			myNetwork.setLearningRate(inputDataPairs[staticCycle][3][0][1]);
 			myNetwork.setMomentum(inputDataPairs[staticCycle][3][0][2]);
-			
+			myNetwork.setMaxTotalMeanSquareError(0.00004);
 
 			myNetwork.setTrainingCycleListener(new ICycleListener() {
 				public void handlerError(int cycleCounter, double totalMeanSquareError,	ArrayList<IResultIterator> resultIteratorArray) {
@@ -363,7 +366,7 @@ public class NetworkTest extends TestCase{
 			});			
 			
 			System.err.println("Hello");
-			myNetwork.executeTraining(true, myTrainingDataListener, 0.00004);
+			myNetwork.executeTraining(true, myTrainingDataListener);
 
 			
 		}

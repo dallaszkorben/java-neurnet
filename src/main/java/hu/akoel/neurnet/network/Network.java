@@ -22,7 +22,8 @@ public class Network {
 	private ArrayList<Layer> layerList = new ArrayList<Layer>();	
 	private double α = 0.3;
 	private double β = 0.0;
-	private int maxTrainCycle = 1;
+	private int maxTrainingLoop = 1;
+	private double maxTotalMeanSquareError = 0.001;
 	private boolean stopTraining = false;
 	
 	private InputConnector inputConnector;
@@ -47,12 +48,20 @@ public class Network {
 		return this.β;
 	}
 	
-	public void setMaxTrainCycle( int maxTrainCycle ){
-		this.maxTrainCycle = maxTrainCycle;
+	public void setMaxTrainingLoop( int maxTrainingLoop ){
+		this.maxTrainingLoop = maxTrainingLoop;
 	}
 	
 	public int getMaxTrainCycle(){
-		return this.maxTrainCycle;
+		return this.maxTrainingLoop;
+	}
+	
+	public void setMaxTotalMeanSquareError( double maxTotalMeanSquareError ){
+		this.maxTotalMeanSquareError = maxTotalMeanSquareError;
+	}
+	
+	public double getMaxTotalMeanSquareError(){
+		return this.maxTotalMeanSquareError;
 	}
 	
 	public void addLayer( Layer layer ){
@@ -70,6 +79,10 @@ public class Network {
 	
 	public void setActivityListener( IActivityListener activityListener ){
 		this.activityListener = activityListener;
+	}
+	
+	public IActivityListener getActivityListener(){
+		return this.activityListener;
 	}
 	
 	public void setResetWeightStrategy( IResetWeightStrategy resetWeightStrategy ){
@@ -139,11 +152,11 @@ public class Network {
 		hasBeenInitialized = true;
 	}
 
-	public void executeTraining( DataHandler trainingDataHandler, double maxTotalMeanSquareError ){
-		executeTraining(true, trainingDataHandler, maxTotalMeanSquareError);
+	public void executeTraining( DataHandler trainingDataHandler ){
+		executeTraining(true, trainingDataHandler );
 	}
 	
-	public void executeTraining( boolean needResetWeights, DataHandler trainingDataHandler, double maxTotalMeanSquareError ){
+	public void executeTraining( boolean needResetWeights, DataHandler trainingDataHandler ){
 	
 		if( null != activityListener ){
 			activityListener.started();
@@ -165,7 +178,7 @@ public class Network {
 		setDataHandler( trainingDataHandler );
 		
 		//Run the training again and again until the error is less then a certain value
-		for( int i = 0; i < maxTrainCycle; i++ ){
+		for( int i = 0; i < maxTrainingLoop; i++ ){
 			
 			double squareError = 0;
 
