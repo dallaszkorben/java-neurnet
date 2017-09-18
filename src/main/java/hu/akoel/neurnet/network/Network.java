@@ -9,14 +9,14 @@ import hu.akoel.neurnet.connectors.OutputConnector;
 import hu.akoel.neurnet.handlers.DataHandler;
 import hu.akoel.neurnet.layer.Layer;
 import hu.akoel.neurnet.listeners.IActivityListener;
-import hu.akoel.neurnet.listeners.ICycleListener;
+import hu.akoel.neurnet.listeners.ILoopListener;
 import hu.akoel.neurnet.resultiterator.IResultIterator;
 import hu.akoel.neurnet.strategies.IResetWeightStrategy;
 import hu.akoel.neurnet.strategies.RandomResetWeightStrategy;
 
 public class Network {
-	private ICycleListener trainingCycleListener = null;
-	private ICycleListener testCycleListener = null;
+	private ILoopListener trainingLoopListener = null;
+	private ILoopListener testLoopListener = null;
 	private IActivityListener activityListener = null;
 	private IResetWeightStrategy resetWeightStrategy = new RandomResetWeightStrategy();
 	private ArrayList<Layer> layerList = new ArrayList<Layer>();	
@@ -69,12 +69,20 @@ public class Network {
 		hasBeenInitialized = false;
 	}	
 
-	public void setTrainingCycleListener( ICycleListener cycleListener ){
-		this.trainingCycleListener = cycleListener;
+	public void setTrainingLoopListener( ILoopListener loopListener ){
+		this.trainingLoopListener = loopListener;
 	}
 	
-	public void setTestCycleListener( ICycleListener cycleListener ){
-		this.testCycleListener = cycleListener;
+	public ILoopListener getTrainingLoopListener(){
+		return this.trainingLoopListener;
+	}
+	
+	public void setTestLoopleListener( ILoopListener loopListener ){
+		this.testLoopListener = loopListener;
+	}
+	
+	public ILoopListener getTestLoopListener(){
+		return this.testLoopListener;
 	}
 	
 	public void setActivityListener( IActivityListener activityListener ){
@@ -89,7 +97,7 @@ public class Network {
 		this.resetWeightStrategy = resetWeightStrategy;
 	}
 	
-	private void resetWeights(){
+	public void resetWeights(){
 		inputConnector.resetWeights();
 		
 		Iterator<InnerConnector> innerConnectorIterator = innerConnectorList.iterator();
@@ -118,6 +126,10 @@ public class Network {
 	
 	public void stopTraining(){
 		this.stopTraining = true;
+	}
+
+	public boolean isTrainingStopped(){
+	    return this.stopTraining;
 	}
 	
 	/**
@@ -222,8 +234,8 @@ public class Network {
 			
 			squareError /= trainingDataHandler.getSize();
 			
-			if( null != trainingCycleListener )
-				trainingCycleListener.handlerError( i, squareError, getResultIteratorArray());
+			if( null != trainingLoopListener )
+				trainingLoopListener.handlerError( i, squareError, getResultIteratorArray());
 		
 			if( squareError <= maxTotalMeanSquareError ){				
 				break;
@@ -234,6 +246,8 @@ public class Network {
 			}
 		}
 		
+		stopTraining = true;
+
 		if( null != activityListener ){
 			activityListener.stopped();
 		}
@@ -264,8 +278,8 @@ public class Network {
 				innerConnector.calculateInputSigmas();
 			}
 
-			if( null != testCycleListener ){
-				testCycleListener.handlerError( i, outputConnector.getMeanSquareError(), getResultIteratorArray());
+			if( null != testLoopListener ){
+				testLoopListener.handlerError( i, outputConnector.getMeanSquareError(), getResultIteratorArray());
 			}
 			
 			i++;

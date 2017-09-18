@@ -4,6 +4,6 @@ import java.util.ArrayList;
 
 import hu.akoel.neurnet.resultiterator.IResultIterator;
 
-public interface ICycleListener {
+public interface ILoopListener {
 	public void handlerError( int cycleCounter, double totalMeanSquareError, ArrayList<IResultIterator> resultIteratorArray );
 }

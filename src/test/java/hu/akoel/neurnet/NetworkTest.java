@@ -6,7 +6,7 @@ import java.util.Iterator;
 import hu.akoel.neurnet.activationfunctions.IActivationFunction;
 import hu.akoel.neurnet.handlers.DataHandler;
 import hu.akoel.neurnet.layer.Layer;
-import hu.akoel.neurnet.listeners.ICycleListener;
+import hu.akoel.neurnet.listeners.ILoopListener;
 import hu.akoel.neurnet.network.Network;
 import hu.akoel.neurnet.neuron.Neuron;
 import hu.akoel.neurnet.resultiterator.IResultIterator;
@@ -257,7 +257,7 @@ public class NetworkTest extends TestCase{
 			myNetwork.setMaxTotalMeanSquareError(0.00005);
 			
 			//--- that is under TEST ---
-			myNetwork.setTrainingCycleListener(new ICycleListener() {
+			myNetwork.setTrainingLoopListener(new ILoopListener() {
 				int cycle = 0;
 				public void handlerError(int cycleCounter, double totalMeanSquareError,	ArrayList<IResultIterator> resultIteratorArray) {
 					assertEquals((int)outputDataPairs[staticCycle][cycle][0][0], cycleCounter);
@@ -307,7 +307,7 @@ public class NetworkTest extends TestCase{
 			myNetwork.executeTraining(true, myTrainingDataListener);
 			
 			//--- that is under TEST ---
-			myNetwork.setTestCycleListener(new ICycleListener() {
+			myNetwork.setTestLoopleListener(new ILoopListener() {
 				int cycle = 0;
 				public void handlerError(int cycleCounter, double totalMeanSquareError,	ArrayList<IResultIterator> resultIteratorArray) {
 					
@@ -357,7 +357,7 @@ public class NetworkTest extends TestCase{
 			myNetwork.setMomentum(inputDataPairs[staticCycle][3][0][2]);
 			myNetwork.setMaxTotalMeanSquareError(0.00004);
 
-			myNetwork.setTrainingCycleListener(new ICycleListener() {
+			myNetwork.setTrainingLoopListener(new ILoopListener() {
 				public void handlerError(int cycleCounter, double totalMeanSquareError,	ArrayList<IResultIterator> resultIteratorArray) {
 
 					if( cycleCounter % 1000 == 0)
