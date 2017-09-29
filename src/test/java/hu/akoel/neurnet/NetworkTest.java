@@ -79,8 +79,18 @@ public class NetworkTest extends TestCase{
 		}
 
 		@Override
-		public double getSize() {			
+		public int getSize() {			
 			return input.length;
+		}
+
+		@Override
+		public int getInputs() {			
+			return 0;
+		}
+
+		@Override
+		public int getOutputs() {
+			return 0;
 		}		
 	}
 	
@@ -333,42 +343,62 @@ public class NetworkTest extends TestCase{
  	
 	
 	
-	public void blabla(){	
+	public void testWithOneLayer(){	
+		int layerSize = 3;
 		
-		final double[][][][] inputDataPairs = {
-				//{δi1, δi2, δi3}, {α, β}, {w1, w2, w3, w4, w5, w6, w7, w8, w9}, {σ1, σ2, σ3}
-				//{I},      {O},    	 {w01 w10 w11 w20},       {cycle, α, β}
+		final double[][][][] dataPairs = {
+				//{w01 w10 w11 w20} {I} {O} {loop, α, β, error}
 				{
-					{{0.1}, {0.15}, {0.2}, {0.3}, {0.35}, {0.4}, {0.45}, {0.5}}, 
-					{{0.1}, {0.15}, {0.2}, {0.3}, {0.35}, {0.4}, {0.45}, {0.5}},  
-					{{1.0}, {2.0, 3.0}, {4.0, 5.0}}, 
-					{{10000000.0, 0.3, 0.1}}
+					{{0.1}, {0.15}, {0.2}}, 
+					{{0.1, 0.15,0.2}},  
+					{{0.1, 0.15, 0.2}}, 
+					{{41000.0, 0.3, 0.1, 0.0000001}},
+					{{1.2187842915760593E-7}}
 				},					
 		};	
 		
-		for( staticCycle = 0; staticCycle < inputDataPairs.length; staticCycle++ ){
+		for( staticCycle = 0; staticCycle < dataPairs.length; staticCycle++ ){
 
-			Network myNetwork = getGenaralNeuron(inputDataPairs);
-
-			MyDataHandler myTrainingDataListener = new MyDataHandler(inputDataPairs[staticCycle][0], inputDataPairs[staticCycle][1]);
+			// ---
+			final Layer layer = new Layer();
+			for( int i = 0; i < layerSize; i++ ){
+				Neuron neuron = new Neuron();
+				layer.addNeuron(neuron);
+			}
 			
-			myNetwork.setMaxTrainingLoop( (int)inputDataPairs[staticCycle][3][0][0] );
-			myNetwork.setLearningRate(inputDataPairs[staticCycle][3][0][1]);
-			myNetwork.setMomentum(inputDataPairs[staticCycle][3][0][2]);
-			myNetwork.setMaxTotalMeanSquareError(0.00004);
+			Network myNetwork = new Network();
+			myNetwork.addLayer(layer);
+			
+			//Set initial Weights
+			myNetwork.setResetWeightStrategy( new IResetWeightStrategy() {
+				public double getWeight(Neuron outputNeuron, Neuron inputNeuron) {
+					
+					return dataPairs[staticCycle][0][inputNeuron.getIndex()][0];
+
+				}
+			});
+
+			// ---
+			
+			MyDataHandler myTrainingDataListener = new MyDataHandler(dataPairs[staticCycle][1], dataPairs[staticCycle][2]);
+			
+			myNetwork.setMaxTrainingLoop( (int)dataPairs[staticCycle][3][0][0] );
+			myNetwork.setLearningRate(dataPairs[staticCycle][3][0][1]);
+			myNetwork.setMomentum(dataPairs[staticCycle][3][0][2]);
+			myNetwork.setMaxTotalMeanSquareError(dataPairs[staticCycle][3][0][3]);
 
 			myNetwork.setTrainingLoopListener(new ILoopListener() {
 				public void handlerError(int cycleCounter, double totalMeanSquareError,	ArrayList<IResultIterator> resultIteratorArray) {
 
-					if( cycleCounter % 1000 == 0)
-						System.err.println( cycleCounter + ": " + totalMeanSquareError);
+					if( (cycleCounter + 1) % dataPairs[staticCycle][3][0][0] == 0){
+						//System.err.println( cycleCounter + 1 + ": " + totalMeanSquareError);
+						assertEquals(dataPairs[staticCycle][4][0][0], totalMeanSquareError);
+					}
 				}
 			});			
 			
-			System.err.println("Hello");
 			myNetwork.executeTraining(true, myTrainingDataListener);
 
-			
 		}
 	}
 	

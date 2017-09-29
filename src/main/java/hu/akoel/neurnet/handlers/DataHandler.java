@@ -8,5 +8,9 @@ public abstract class DataHandler implements InputDataHandler, OutputDataHandler
 	
 	abstract public void takeNext();
 	
-	abstract public double getSize();
+	abstract public int getSize();
+	
+	abstract public int getInputs();
+	
+	abstract public int getOutputs();
 }
