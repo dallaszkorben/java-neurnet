@@ -66,6 +66,7 @@ public class Network {
 	
 	public void addLayer( Layer layer ){
 		layerList.add( layer );
+		//initialize();
 		hasBeenInitialized = false;
 	}	
 
@@ -132,11 +133,29 @@ public class Network {
 	    return this.stopTraining;
 	}
 	
+	public int getInputNeurons(){
+		if( layerList.size() >= 1 ){
+			Layer layer = layerList.get( 0 );
+			return layer.getSize();
+		}else{
+			return -1;
+		}
+	}
+	
+	public int getOutptuNeurons(){
+		if( layerList.size() >= 1 ){
+			Layer layer = layerList.get( layerList.size() - 1 );
+			return layer.getSize();
+		}else{
+			return -1;
+		}
+	}
+	
 	/**
 	 * Must be called when added or removed Layer
 	 * @param dataHandler
 	 */
-	private void initialize(){
+	public void initialize(){
 	
 		//inputConnector = new InputConnector( dataHandler, layerList.get(0) );
 		inputConnector = new InputConnector( layerList.get(0) );
